@@ -72,6 +72,9 @@ fun StationDetailsSheet(
                     onMapsClick = { openMapsIntent(context, station) }
                 )
 
+                // Recap tiles (mechanical bikes, electric bikes, available stands)
+                StationDetailsRecap(station = station)
+
                 // Bikes section
                 StationDetailsBikesCard(station = station)
 
