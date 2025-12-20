@@ -31,7 +31,6 @@ fun StationItem(
     modifier: Modifier = Modifier,
     onStationClick: (Station) -> Unit = {}
 ) {
-    System.out.println(station)
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -65,16 +64,16 @@ fun StationItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 StationInfoItem(
-                    icon = Icons.AutoMirrored.Filled.DirectionsBike, // Unresolved reference
+                    icon = Icons.AutoMirrored.Filled.DirectionsBike,
                     label = "Vélos",
-                    value = station.availableBikes.toString(),
+                    value = station.totalStands.availabilities.bikes.toString(),
                     modifier = Modifier.weight(1f)
                 )
 
                 StationInfoItem(
-                    icon = Icons.Filled.LocalParking, // Unresolved reference
+                    icon = Icons.Filled.LocalParking,
                     label = "Places",
-                    value = station.availableBikeStands.toString(),
+                    value = station.totalStands.availabilities.stands.toString(),
                     modifier = Modifier.weight(1f)
                 )
             }

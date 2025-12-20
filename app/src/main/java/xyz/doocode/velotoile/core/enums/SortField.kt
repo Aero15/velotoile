@@ -1,0 +1,8 @@
+enum class SortField {
+    NUMBER,
+    NAME,
+    TOTAL_BIKES,
+    MECHANICAL_BIKES,
+    ELECTRICAL_BIKES,
+    AVAILABLE_STANDS
+}

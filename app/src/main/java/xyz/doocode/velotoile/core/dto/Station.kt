@@ -11,19 +11,10 @@ data class Station (
     val bonus: Boolean,
     val status: String,
     val connected: Boolean,
-    @SerializedName("contract_name")
+    var overflow: Boolean,
     val contractName: String,
-    @SerializedName("bike_stands")
-    val bikeStands: Int,
-    @SerializedName("available_bike_stands")
-    val availableBikeStands: Int,
-    @SerializedName("available_bikes")
-    val availableBikes: Int,
-    @SerializedName("last_update")
     val lastUpdate: Long,
-    @SerializedName("total_stands")
     val totalStands: Stand,
-    @SerializedName("main_stands")
     val mainStands: Stand
 )
 
@@ -40,12 +31,8 @@ data class Stand (
 data class Availabilities (
     val bikes: Int,
     val stands: Int,
-    @SerializedName("mechanical_bikes")
     val mechanicalBikes: Int,
-    @SerializedName("electrical_bikes")
     val electricalBikes: Int,
-    @SerializedName("electrical_internal_batteries")
-    val electricalInternalBatteries: Int,
-    @SerializedName("electrical_removable_batteries")
-    val electricalRemovableBatteries: Int
+    val electricalInternalBatteryBikes: Int,
+    val electricalRemovableBatteryBikes: Int
 )
