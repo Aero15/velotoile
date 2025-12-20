@@ -29,9 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import xyz.doocode.velotoile.core.dto.Station
 import xyz.doocode.velotoile.ui.components.SortMenu
 import xyz.doocode.velotoile.ui.components.StationsList
 import xyz.doocode.velotoile.ui.components.SearchBar
+import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 class MainActivity : ComponentActivity() {
@@ -62,6 +64,7 @@ class MainActivity : ComponentActivity() {
 fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     var isSearching by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
+    var selectedStation by remember { mutableStateOf<Station?>(null) }
     val context = LocalContext.current
     
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
@@ -79,13 +82,13 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                         Icon(Icons.Filled.Search, contentDescription = "Recherche")
                     }
                     
-                    IconButton(
+                    /*IconButton(
                         onClick = {
                             Toast.makeText(context, "TODO: Filtres", Toast.LENGTH_SHORT).show()
                         }
                     ) {
                         Icon(Icons.Filled.FilterList, contentDescription = "Filtres")
-                    }
+                    }*/
                     
                     IconButton(
                         onClick = { showSortMenu = !showSortMenu }
@@ -114,7 +117,11 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                 // Afficher un loader
             }
             is Resource.Success -> {
-                StationsList(stations = filteredStations.value, modifier = Modifier.fillMaxSize())
+                StationsList(
+                    stations = filteredStations.value,
+                    modifier = Modifier.fillMaxSize(),
+                    onStationClick = { station -> selectedStation = station }
+                )
             }
             is Resource.Error -> {
                 // Afficher l'erreur
@@ -124,4 +131,10 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
             }
         }
     }
+
+    // Station details sheet
+    StationDetailsSheet(
+        station = selectedStation,
+        onDismiss = { selectedStation = null }
+    )
 }
