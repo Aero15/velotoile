@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import xyz.doocode.velotoile.core.dto.Station
 import xyz.doocode.velotoile.ui.components.SortMenu
 import xyz.doocode.velotoile.ui.components.StationsList
-import xyz.doocode.velotoile.ui.components.SearchBar
+import xyz.doocode.velotoile.ui.components.common.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 

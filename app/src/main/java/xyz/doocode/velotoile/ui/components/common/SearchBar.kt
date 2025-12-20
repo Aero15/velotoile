@@ -1,5 +1,6 @@
-package xyz.doocode.velotoile.ui.components
+package xyz.doocode.velotoile.ui.components.common
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -29,14 +30,16 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 @Composable
 fun SearchBar(
-    searchQuery: String,
-    onSearchQueryChanged: (String) -> Unit,
-    onCloseSearch: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    searchQuery: String = "",
+    onSearchQueryChanged: (String) -> Unit = {},
+    onCloseSearch: () -> Unit = {},
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember { FocusRequester() }
@@ -99,3 +102,18 @@ fun SearchBar(
     }
 }
 
+@Preview(
+    name = "Light mode"
+)
+@Preview(
+    name = "Dark mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun SearchBarPreview() {
+    VelotoileTheme() {
+        SearchBar(
+            searchQuery = "Lorem ipsum"
+        )
+    }
+}
