@@ -77,7 +77,7 @@ private fun RecapTile(
 ) {
     val isZero = value.toIntOrNull() == 0
     val finalBackgroundColor = if (isZero) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else backgroundColor
-    val finalContentColor = if (isZero) Color(0xFFD32F2F) else Color.White
+    val finalContentColor = if (isZero) Color(0xFFD32F2F) else MaterialTheme.colorScheme.onSurface
     
     Column(
         modifier = modifier

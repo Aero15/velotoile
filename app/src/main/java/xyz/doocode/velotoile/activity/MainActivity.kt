@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         viewModel.loadStations()
-        //viewModel.startAutoRefresh()
+        viewModel.startAutoRefresh()
 
         setContent {
             VelotoileTheme {

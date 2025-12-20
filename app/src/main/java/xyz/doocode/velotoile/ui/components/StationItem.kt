@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -88,6 +90,9 @@ private fun StationInfoItem(
     value: String,
     modifier: Modifier = Modifier
 ) {
+    val isZero = value.toIntOrNull() == 0
+    val finalIconColor = getIconColor(value.toInt())
+    val finalContentColor = getTextColor(value.toInt())
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -95,23 +100,43 @@ private fun StationInfoItem(
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(end = 8.dp)
+            tint = finalIconColor,
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .size(32.dp)
         )
 
         Column {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = finalContentColor
             )
 
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = finalContentColor
             )
         }
+    }
+}
+
+@Composable
+private fun getIconColor(value: Int): Color {
+    return when {
+        value == 0 -> Color(0xFFD32F2F)
+        value in 1..2 -> Color(0xFFFF9800)
+        else -> MaterialTheme.colorScheme.primary
+    }
+}
+
+@Composable
+private fun getTextColor(value: Int): Color {
+    return when {
+        value == 0 -> Color(0xFFD32F2F)
+        value in 1..2 -> Color(0xFFFF9800)
+        else -> MaterialTheme.colorScheme.onSurface
     }
 }
