@@ -48,14 +48,15 @@ fun StationDetailsSheet(
             containerColor = MaterialTheme.colorScheme.surface,
             scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.3f),
             dragHandle = {
-                Column(
+                /*Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFB7007A)),
+                        .background(Color(0xFFB7007A))
+                        .padding(vertical = 0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    BottomSheetDefaults.DragHandle()
-                }
+                    //BottomSheetDefaults.DragHandle()
+                }*/
             }
         ) {
             Column(

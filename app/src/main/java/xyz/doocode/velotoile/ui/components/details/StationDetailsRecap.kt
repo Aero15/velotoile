@@ -42,7 +42,7 @@ fun StationDetailsRecap(station: Station) {
         RecapTile(
             icon = Icons.AutoMirrored.Filled.DirectionsBike,
             label = "Vélos\nmécanique",
-            value = station.totalStands.availabilities.bikes.toString(),
+            value = station.totalStands.availabilities.mechanicalBikes.toString(),
             backgroundColor = MechanicalBikeBlue,
             modifier = Modifier.weight(1f)
         )
