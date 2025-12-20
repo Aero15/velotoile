@@ -2,16 +2,17 @@ package xyz.doocode.velotoile.activity
 
 import StationsViewModel
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,15 +21,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
 import xyz.doocode.velotoile.ui.components.SortMenu
 import xyz.doocode.velotoile.ui.components.StationsList
@@ -73,15 +76,19 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize()) {
         if (!isSearching) {
             TopAppBar(
+                modifier = Modifier.padding(0.dp),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF00999d), // light:00abc4, dark:00999d
+                ),
+                windowInsets = WindowInsets(top = 0.dp),
                 title = { Text("Stations") },
-                //containerColor = Color(0xFFb7007a),
                 actions = {
                     IconButton(
                         onClick = { isSearching = !isSearching }
                     ) {
                         Icon(Icons.Filled.Search, contentDescription = "Recherche")
                     }
-                    
+
                     /*IconButton(
                         onClick = {
                             Toast.makeText(context, "TODO: Filtres", Toast.LENGTH_SHORT).show()
@@ -93,23 +100,27 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     IconButton(
                         onClick = { showSortMenu = !showSortMenu }
                     ) {
-                        Icon(Icons.Filled.Sort, contentDescription = "Tri")
+                        Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Tri")
                     }
+
+                    SortMenu(
+                        isMenuOpen = showSortMenu,
+                        onMenuOpenChange = { showSortMenu = it },
+                        viewModel = viewModel,
+                        modifier = Modifier.padding(top = 32.dp)
+                    )
                 }
             )
         } else {
             SearchBar(
+                transparent = true,
                 searchQuery = searchQuery.value,
                 onSearchQueryChanged = { viewModel.setSearchQuery(it) },
-                onCloseSearch = { isSearching = false }
+                onCloseSearch = { isSearching = false },
+                modifier = Modifier
+                    .background(Color(0xFF00999d))
             )
         }
-
-        SortMenu(
-            isMenuOpen = showSortMenu,
-            onMenuOpenChange = { showSortMenu = it },
-            viewModel = viewModel
-        )
 
         val stationsResource = viewModel.stations.observeAsState()
         when (val resource = stationsResource.value) {
