@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,7 +46,17 @@ fun StationDetailsSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.surface,
-            scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.3f)
+            scrimColor = MaterialTheme.colorScheme.scrim.copy(alpha = 0.3f),
+            dragHandle = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFFB7007A)),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    BottomSheetDefaults.DragHandle()
+                }
+            }
         ) {
             Column(
                 modifier = Modifier
@@ -54,40 +65,12 @@ fun StationDetailsSheet(
                     .padding(bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Header with back and maps buttons + station info (no spacing between them)
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    // Header with back and maps buttons
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFB7007A)),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = onDismiss) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Retour",
-                                tint = Color.White
-                            )
-                        }
-
-                        IconButton(
-                            onClick = {
-                                openMapsIntent(context, station)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.LocationOn,
-                                contentDescription = "Ouvrir sur la carte",
-                                tint = Color.White
-                            )
-                        }
-                    }
-
-                    // Header with station info
-                    StationDetailsHeader(station = station)
-                }
+                // Header with station info (includes back and maps buttons)
+                StationDetailsHeader(
+                    station = station,
+                    onBackClick = onDismiss,
+                    onMapsClick = { openMapsIntent(context, station) }
+                )
 
                 // Bikes section
                 StationDetailsBikesCard(station = station)
