@@ -1,27 +1,15 @@
-package xyz.doocode.velotoile.ui.components
+package xyz.doocode.velotoile.ui.components.search.menu
 
 import StationsViewModel
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.*
+import androidx.compose.ui.unit.*
 
 @Composable
 fun SortMenu(
@@ -89,56 +77,4 @@ fun SortMenu(
             }
         }
     }
-}
-
-@Composable
-private fun SortOrderMenuItem(
-    label: String,
-    icon: ImageVector,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    DropdownMenuItem(
-        text = {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = label,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        },
-        leadingIcon = {
-            Icon(icon, contentDescription = label)
-        },
-        trailingIcon = {
-            if (isSelected) {
-                Icon(Icons.Filled.CheckCircle, contentDescription = "Sélectionné")
-            }
-        },
-        onClick = onClick
-    )
-}
-
-@Composable
-private fun SortFieldMenuItem(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    DropdownMenuItem(
-        text = {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = label,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        },
-        trailingIcon = {
-            if (isSelected) {
-                Icon(Icons.Filled.CheckCircle, contentDescription = "Sélectionné")
-            }
-        },
-        onClick = onClick
-    )
 }

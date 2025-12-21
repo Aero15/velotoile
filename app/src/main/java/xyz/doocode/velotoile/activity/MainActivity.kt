@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
-import xyz.doocode.velotoile.ui.components.SortMenu
+import xyz.doocode.velotoile.ui.components.search.menu.SortMenu
 import xyz.doocode.velotoile.ui.components.StationsList
 import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
@@ -82,12 +83,6 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                 windowInsets = WindowInsets(top = 0.dp),
                 title = { Text("Stations") },
                 actions = {
-                    IconButton(
-                        onClick = { isSearching = !isSearching }
-                    ) {
-                        Icon(Icons.Filled.Search, contentDescription = "Recherche")
-                    }
-
                     /*IconButton(
                         onClick = {
                             Toast.makeText(context, "TODO: Filtres", Toast.LENGTH_SHORT).show()
@@ -99,7 +94,7 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     IconButton(
                         onClick = { showSortMenu = !showSortMenu }
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Tri")
+                        Icon(Icons.Filled.SortByAlpha, contentDescription = "Tri")
                     }
 
                     SortMenu(
@@ -108,6 +103,12 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                         viewModel = viewModel,
                         modifier = Modifier.padding(top = 32.dp)
                     )
+
+                    IconButton(
+                        onClick = { isSearching = !isSearching }
+                    ) {
+                        Icon(Icons.Filled.Search, contentDescription = "Recherche")
+                    }
                 }
             )
         } else {

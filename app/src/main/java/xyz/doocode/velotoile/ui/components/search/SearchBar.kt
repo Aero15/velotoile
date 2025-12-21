@@ -136,7 +136,7 @@ fun SearchBar(
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-fun SearchBarPreview() {
+private fun SearchBarPreview() {
     VelotoileTheme {
         SearchBar(
             searchQuery = "Lorem ipsum"
