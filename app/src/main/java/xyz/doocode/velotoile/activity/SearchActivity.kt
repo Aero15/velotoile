@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -81,7 +80,7 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     containerColor = Color(0xFF00999d), // light:00abc4, dark:00999d
                 ),
                 windowInsets = WindowInsets(top = 0.dp),
-                title = { Text("Stations") },
+                title = { Text("Ginko Vélocité") },
                 actions = {
                     /*IconButton(
                         onClick = {

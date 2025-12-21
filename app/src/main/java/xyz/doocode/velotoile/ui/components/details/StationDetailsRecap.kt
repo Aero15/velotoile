@@ -1,5 +1,6 @@
 package xyz.doocode.velotoile.ui.components.details
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.ElectricBike
 import androidx.compose.material.icons.filled.LocalParking
+import androidx.compose.material.icons.filled.PedalBike
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,11 +24,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
 import xyz.doocode.velotoile.ui.theme.AvailableStandsYellow
 import xyz.doocode.velotoile.ui.theme.ElectricBikeGreen
 import xyz.doocode.velotoile.ui.theme.MechanicalBikeBlue
+import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 @Composable
 fun StationDetailsRecap(station: Station) {
@@ -34,11 +38,11 @@ fun StationDetailsRecap(station: Station) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Mechanical bikes tile
         RecapTile(
-            icon = Icons.AutoMirrored.Filled.DirectionsBike,
+            icon = Icons.Filled.PedalBike,
             label = "Vélos\nmécanique",
             value = station.totalStands.availabilities.mechanicalBikes.toString(),
             backgroundColor = MechanicalBikeBlue,
@@ -107,6 +111,26 @@ private fun RecapTile(
             style = MaterialTheme.typography.headlineSmall,
             color = finalContentColor,
             fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Preview(
+    name = "Light mode",
+    showBackground = true
+)
+@Preview(
+    name = "Dark mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun RecapTilePreview() {
+    VelotoileTheme {
+        RecapTile(
+            icon = Icons.Filled.PedalBike,
+            label = "Vélos\nmécanique",
+            value = "10",
+            backgroundColor = MechanicalBikeBlue
         )
     }
 }

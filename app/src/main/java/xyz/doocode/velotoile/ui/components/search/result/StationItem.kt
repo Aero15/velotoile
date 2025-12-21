@@ -1,6 +1,7 @@
 package xyz.doocode.velotoile.ui.components.search.result
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,7 +11,7 @@ import androidx.compose.material.icons.filled.LocalParking
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.*
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,38 +24,38 @@ fun StationItem(
     modifier: Modifier = Modifier,
     onStationClick: (Station) -> Unit = {}
 ) {
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(0.dp)
     Card(
         modifier = modifier
-            .clip(shape)
             .fillMaxWidth()
             .clickable { onStationClick(station) },
-        //elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = MaterialTheme.colorScheme.background
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
+                .padding(top = 12.dp)
         ) {
             // Station name
             Text(
                 text = station.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp)
+                    .padding(bottom = 4.dp)
             )
 
             // Bikes and stands info
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 StationInfoItem(
@@ -71,6 +72,13 @@ fun StationItem(
                     modifier = Modifier.weight(1f)
                 )
             }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(MaterialTheme.colorScheme.outlineVariant)
+            )
         }
     }
 }
