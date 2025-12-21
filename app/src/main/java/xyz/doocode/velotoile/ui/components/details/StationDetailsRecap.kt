@@ -2,24 +2,15 @@ package xyz.doocode.velotoile.ui.components.details
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.ElectricBike
 import androidx.compose.material.icons.filled.LocalParking
 import androidx.compose.material.icons.filled.PedalBike
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -27,10 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
-import xyz.doocode.velotoile.ui.theme.AvailableStandsYellow
-import xyz.doocode.velotoile.ui.theme.ElectricBikeGreen
-import xyz.doocode.velotoile.ui.theme.MechanicalBikeBlue
-import xyz.doocode.velotoile.ui.theme.VelotoileTheme
+import xyz.doocode.velotoile.ui.theme.*
 
 @Composable
 fun StationDetailsRecap(station: Station) {
@@ -85,7 +73,7 @@ private fun RecapTile(
         modifier = modifier
             .background(
                 color = finalBackgroundColor,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(18.dp)
             )
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

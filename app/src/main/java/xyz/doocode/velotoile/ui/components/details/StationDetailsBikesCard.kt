@@ -1,98 +1,72 @@
 package xyz.doocode.velotoile.ui.components.details
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.Eject
+import androidx.compose.material.icons.filled.ElectricBike
+import androidx.compose.material.icons.filled.PedalBike
+import androidx.compose.material.icons.filled.Power
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.ui.theme.*
 
 @Composable
 fun StationDetailsBikesCard(station: Station) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    StationDetailsSection(
+        title = "Vélos disponibles (${station.totalStands.availabilities.bikes})",
+        icon = Icons.AutoMirrored.Filled.DirectionsBike,
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Title
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.DirectionsBike,
-                    contentDescription = "Vélos",
-                    tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    text = "Vélos disponibles",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Total bikes
-            BikeInfoRow(
-                label = "Total",
-                value = station.totalStands.availabilities.bikes.toString(),
-                backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
-            )
-
+        Column(modifier = Modifier.padding(0.dp)) {
             // Mechanical bikes
             BikeInfoRow(
                 label = "Mécaniques",
-                value = station.totalStands.availabilities.mechanicalBikes.toString(),
-                backgroundColor = Color(0xFFFFA500).copy(alpha = 0.1f),
-                modifier = Modifier.padding(top = 8.dp)
+                icon = Icons.Filled.PedalBike,
+                value = station.totalStands.availabilities.mechanicalBikes,
+                backgroundColor = MechanicalBikeBlue.copy(alpha = 0.5f),
             )
 
             // Electrical bikes
             BikeInfoRow(
                 label = "Électriques",
-                value = station.totalStands.availabilities.electricalBikes.toString(),
-                backgroundColor = Color(0xFF00AA00).copy(alpha = 0.1f),
-                modifier = Modifier.padding(top = 8.dp)
+                icon = Icons.Filled.ElectricBike,
+                value = station.totalStands.availabilities.electricalBikes,
+                backgroundColor = ElectricBikeGreen.copy(alpha = 0.5f),
+                modifier = Modifier.padding(top = 1.dp),
             )
 
-            // Internal battery
-            BikeInfoRow(
-                label = "  ├─ Batterie interne",
-                value = station.totalStands.availabilities.electricalInternalBatteryBikes.toString(),
-                backgroundColor = Color(0xFF87CEEB).copy(alpha = 0.1f),
-                modifier = Modifier.padding(top = 8.dp, start = 16.dp)
-            )
+            if (station.contractName != "besancon") {
+                // Internal battery
+                BikeInfoRow(
+                    indent = true,
+                    icon = Icons.Filled.Power,
+                    label = "Batterie interne",
+                    value = station.totalStands.availabilities.electricalInternalBatteryBikes,
+                    backgroundColor = Color(0xFFFFA500).copy(alpha = 0.5f),
+                    modifier = Modifier.padding(top = 1.dp),
+                )
 
-            // Removable battery
-            BikeInfoRow(
-                label = "  └─ Batterie amovible",
-                value = station.totalStands.availabilities.electricalRemovableBatteryBikes.toString(),
-                backgroundColor = Color(0xFFD4AF37).copy(alpha = 0.1f),
-                modifier = Modifier.padding(top = 8.dp, start = 16.dp)
-            )
+                // Removable battery
+                BikeInfoRow(
+                    indent = true,
+                    icon = Icons.Filled.Eject,
+                    label = "Batterie amovible",
+                    value = station.totalStands.availabilities.electricalRemovableBatteryBikes,
+                    backgroundColor = Color(0xFF00AA00).copy(alpha = 0.5f),
+                    modifier = Modifier.padding(top = 1.dp),
+                )
+            }
         }
     }
 }
@@ -100,30 +74,71 @@ fun StationDetailsBikesCard(station: Station) {
 @Composable
 private fun BikeInfoRow(
     label: String,
-    value: String,
+    value: Number,
+    icon: ImageVector,
     backgroundColor: Color,
+    indent: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(backgroundColor, RoundedCornerShape(8.dp))
-            .padding(12.dp)
+            .background(backgroundColor)
+            .padding(start = 18.dp)
+            .padding(end = 8.dp)
+            .padding(vertical = 8.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(start = if (indent) 28.dp else 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                //tint = finalIconColor,
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .size(24.dp)
+            )
+
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f)
             )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold
-            )
+
+            Box(
+                modifier = Modifier
+                    .width(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = value.toString(),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
+    }
+}
+
+@Preview(
+    name = "Light mode",
+    showBackground = true
+)
+@Preview(
+    name = "Dark mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun BikeInfoRowPreview() {
+    VelotoileTheme{
+        BikeInfoRow(
+            label = "Mécaniques",
+            value = 10,
+            icon = Icons.Filled.PedalBike,
+            backgroundColor = Color(0xFFFFA500).copy(alpha = 0.1f),
+        )
     }
 }

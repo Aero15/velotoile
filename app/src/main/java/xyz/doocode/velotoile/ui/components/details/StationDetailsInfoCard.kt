@@ -1,14 +1,18 @@
 package xyz.doocode.velotoile.ui.components.details
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -19,8 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -28,15 +34,12 @@ import java.util.Locale
 @Composable
 fun StationDetailsInfoCard(station: Station) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent
+        ),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             // Title
             Row(
                 modifier = Modifier
@@ -51,43 +54,66 @@ fun StationDetailsInfoCard(station: Station) {
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
-                    text = "Informations supplémentaires",
+                    text = "Informations",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            // Address
+            if (station.address.isNotEmpty()) {
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.PinDrop,
+                        contentDescription = "Adresse",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .size(28.dp)
+                    )
+
+                    Column {
+                        Text(
+                            text = "Adresse",
+                            fontWeight = FontWeight.SemiBold,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Text(
+                            text = station.address,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
             }
 
             // Number
             InfoRow(
                 label = "Numéro de station",
                 value = station.number.toString(),
-                backgroundColor = Color(0xFFE0E0E0).copy(alpha = 0.5f)
             )
 
             /*// Contract
             InfoRow(
                 label = "Contrat",
                 value = station.contractName,
-                backgroundColor = Color(0xFF64B5F6).copy(alpha = 0.1f),
-                modifier = Modifier.padding(top = 8.dp)
             )*/
 
             // Banking
             InfoRow(
                 label = "Paiement",
                 value = if (station.banking) "Disponible" else "Non disponible",
-                backgroundColor = if (station.banking) Color(0xFF4CAF50).copy(alpha = 0.1f) 
-                    else Color(0xFFF44336).copy(alpha = 0.1f),
-                modifier = Modifier.padding(top = 8.dp)
             )
 
             // Bonus
             InfoRow(
                 label = "Bonus",
                 value = if (station.bonus) "Oui" else "Non",
-                backgroundColor = if (station.bonus) Color(0xFFFFD700).copy(alpha = 0.1f)
-                    else Color(0xFFE0E0E0).copy(alpha = 0.5f),
-                modifier = Modifier.padding(top = 8.dp)
             )
 
             // Last update
@@ -95,8 +121,6 @@ fun StationDetailsInfoCard(station: Station) {
             InfoRow(
                 label = "Dernière maj",
                 value = lastUpdateText,
-                backgroundColor = Color(0xFFC8E6C9).copy(alpha = 0.3f),
-                modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
@@ -106,17 +130,23 @@ fun StationDetailsInfoCard(station: Station) {
 private fun InfoRow(
     label: String,
     value: String,
-    backgroundColor: Color,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(backgroundColor, RoundedCornerShape(8.dp))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            .padding(horizontal = 8.dp)
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(MaterialTheme.colorScheme.outlineVariant)
+        )
+
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -130,6 +160,24 @@ private fun InfoRow(
                 fontWeight = FontWeight.SemiBold
             )
         }
+    }
+}
+
+@Preview(
+    name = "Light mode",
+    showBackground = true
+)
+@Preview(
+    name = "Dark mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun InfoRowPreview() {
+    VelotoileTheme {
+        InfoRow(
+            label = "Numéro de station",
+            value = "123",
+        )
     }
 }
 
