@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
 import xyz.doocode.velotoile.ui.components.SortMenu
 import xyz.doocode.velotoile.ui.components.StationsList
-import xyz.doocode.velotoile.ui.components.common.SearchBar
+import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
