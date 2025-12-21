@@ -17,9 +17,9 @@ import xyz.doocode.velotoile.core.dto.Station
 
 @Composable
 fun StationsList(
+    modifier: Modifier = Modifier,
     stations: List<Station>,
     onStationClick: (Station) -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     if (stations.isEmpty()) {
         Box(
@@ -37,8 +37,9 @@ fun StationsList(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(stations) { station ->
                 StationItem(

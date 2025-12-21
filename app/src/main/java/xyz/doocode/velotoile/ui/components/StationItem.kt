@@ -1,5 +1,6 @@
 package xyz.doocode.velotoile.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -21,11 +22,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 @Composable
 fun StationItem(
@@ -33,14 +37,16 @@ fun StationItem(
     modifier: Modifier = Modifier,
     onStationClick: (Station) -> Unit = {}
 ) {
+    val shape = RoundedCornerShape(16.dp)
     Card(
         modifier = modifier
+            .clip(shape)
             .fillMaxWidth()
             .clickable { onStationClick(station) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(8.dp),
+        //elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
     ) {
         Column(
@@ -90,7 +96,6 @@ private fun StationInfoItem(
     value: String,
     modifier: Modifier = Modifier
 ) {
-    val isZero = value.toIntOrNull() == 0
     val finalIconColor = getIconColor(value.toInt())
     val finalContentColor = getTextColor(value.toInt())
     Row(
@@ -120,6 +125,25 @@ private fun StationInfoItem(
                 color = finalContentColor
             )
         }
+    }
+}
+
+@Preview(
+    name = "Light mode",
+    showBackground = true
+)
+@Preview(
+    name = "Dark mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun StationInfoItemPreview() {
+    VelotoileTheme {
+        StationInfoItem(
+            icon = Icons.AutoMirrored.Filled.DirectionsBike,
+            label = "Vélos",
+            value = "10",
+        )
     }
 }
 

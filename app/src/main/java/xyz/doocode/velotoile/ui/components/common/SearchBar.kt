@@ -131,7 +131,7 @@ fun SearchBar(
 )
 @Composable
 fun SearchBarPreview() {
-    VelotoileTheme() {
+    VelotoileTheme {
         SearchBar(
             searchQuery = "Lorem ipsum"
         )

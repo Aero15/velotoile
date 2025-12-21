@@ -55,7 +55,7 @@ fun StationDetailsSheet(
                         .padding(vertical = 0.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    //BottomSheetDefaults.DragHandle()
+                    BottomSheetDefaults.DragHandle()
                 }*/
             }
         ) {
