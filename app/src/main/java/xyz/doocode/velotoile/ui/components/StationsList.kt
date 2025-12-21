@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.ui.components.search.result.StationItem
 
 @Composable
 fun StationsList(

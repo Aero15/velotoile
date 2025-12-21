@@ -14,8 +14,8 @@ data class Station (
     var overflow: Boolean,
     val contractName: String,
     val lastUpdate: Long,
-    val totalStands: Stand,
-    val mainStands: Stand
+    val totalStands: Stands,
+    val mainStands: Stands
 )
 
 data class Position (
@@ -23,7 +23,7 @@ data class Position (
     val longitude: Double
 )
 
-data class Stand (
+data class Stands (
     val availabilities: Availabilities,
     val capacity: Int
 )

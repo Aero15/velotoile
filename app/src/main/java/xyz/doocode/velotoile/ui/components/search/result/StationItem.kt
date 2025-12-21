@@ -1,34 +1,20 @@
-package xyz.doocode.velotoile.ui.components
+package xyz.doocode.velotoile.ui.components.search.result
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.LocalParking
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.core.dto.*
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 @Composable
@@ -89,45 +75,6 @@ fun StationItem(
     }
 }
 
-@Composable
-private fun StationInfoItem(
-    icon: ImageVector,
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    val finalIconColor = getIconColor(value.toInt())
-    val finalContentColor = getTextColor(value.toInt())
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = finalIconColor,
-            modifier = Modifier
-                .padding(end = 8.dp)
-                .size(32.dp)
-        )
-
-        Column {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = finalContentColor
-            )
-
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = finalContentColor
-            )
-        }
-    }
-}
-
 @Preview(
     name = "Light mode",
     showBackground = true
@@ -137,30 +84,38 @@ private fun StationInfoItem(
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-fun StationInfoItemPreview() {
-    VelotoileTheme {
-        StationInfoItem(
-            icon = Icons.AutoMirrored.Filled.DirectionsBike,
-            label = "Vélos",
-            value = "10",
+private fun StationItemPreview() {
+    val stands = Stands(
+        capacity = 20,
+        availabilities = Availabilities (
+            bikes = 6,
+            stands = 15,
+            mechanicalBikes = 2,
+            electricalBikes = 4,
+            electricalInternalBatteryBikes = 3,
+            electricalRemovableBatteryBikes = 1
         )
-    }
-}
+    )
 
-@Composable
-private fun getIconColor(value: Int): Color {
-    return when {
-        value == 0 -> Color(0xFFD32F2F)
-        value in 1..2 -> Color(0xFFFF9800)
-        else -> MaterialTheme.colorScheme.primary
-    }
-}
+    val station = Station(
+        number = 1234,
+        name = "Station de test",
+        address = "123 Rue de Test, 69000 Lyon",
+        position = Position(45.75, 4.85),
+        lastUpdate = 1,
+        banking = true,
+        bonus = false,
+        status = "OPEN",
+        overflow = false,
+        connected = true,
+        contractName = "lyon",
+        totalStands = stands,
+        mainStands = stands
+    )
 
-@Composable
-private fun getTextColor(value: Int): Color {
-    return when {
-        value == 0 -> Color(0xFFD32F2F)
-        value in 1..2 -> Color(0xFFFF9800)
-        else -> MaterialTheme.colorScheme.onSurface
+    VelotoileTheme {
+        StationItem(
+            station = station
+        )
     }
 }
