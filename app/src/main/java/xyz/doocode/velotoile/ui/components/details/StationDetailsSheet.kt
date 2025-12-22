@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.core.util.openMapsIntent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,34 +84,11 @@ fun StationDetailsSheet(
                 StationDetailsStandsCard(station = station)
 
                 // Additional info
-                StationDetailsInfoCard(station = station)
+                StationDetailsInfoCard(
+                    station = station,
+                    onAddressClick = { openMapsIntent(context, station) }
+                )
             }
-        }
-    }
-}
-
-private fun openMapsIntent(context: Context, station: Station) {
-    val latitude = station.position.latitude
-    val longitude = station.position.longitude
-    val stationName = station.name
-
-    // Format: geo:latitude,longitude?q=latitude,longitude(name)
-    val geoUri = "geo:$latitude,$longitude?q=$latitude,$longitude($stationName)"
-    
-    try {
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(geoUri)
-        }
-        context.startActivity(intent)
-    } catch (e: Exception) {
-        // Si aucune application de carte n'est disponible
-        try {
-            // Fallback vers Google Maps
-            val mapsUri = "https://maps.google.com/maps?q=$latitude,$longitude"
-            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(mapsUri))
-            context.startActivity(webIntent)
-        } catch (e: Exception) {
-            // Silencieusement ignorer l'erreur
         }
     }
 }

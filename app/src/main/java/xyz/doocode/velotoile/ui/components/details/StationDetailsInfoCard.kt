@@ -2,6 +2,7 @@ package xyz.doocode.velotoile.ui.components.details
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,7 +33,10 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun StationDetailsInfoCard(station: Station) {
+fun StationDetailsInfoCard(
+    station: Station,
+    onAddressClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -44,7 +48,8 @@ fun StationDetailsInfoCard(station: Station) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+                    .padding(top = 8.dp)
+                    .padding(bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -62,32 +67,39 @@ fun StationDetailsInfoCard(station: Station) {
 
             // Address
             if (station.address.isNotEmpty()) {
-                Row(
-                    verticalAlignment = Alignment.Top,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onAddressClick)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.PinDrop,
-                        contentDescription = "Adresse",
-                        tint = MaterialTheme.colorScheme.primary,
+                    Row(
+                        verticalAlignment = Alignment.Top,
                         modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(28.dp)
-                    )
-
-                    Column {
-                        Text(
-                            text = "Adresse",
-                            fontWeight = FontWeight.SemiBold,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurface
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.PinDrop,
+                            contentDescription = "Adresse",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(28.dp)
                         )
 
-                        Text(
-                            text = station.address,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                        Column {
+                            Text(
+                                text = "Adresse",
+                                fontWeight = FontWeight.SemiBold,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
+                            Text(
+                                text = station.address,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 }
             }

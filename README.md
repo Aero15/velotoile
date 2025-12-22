@@ -1,4 +1,5 @@
 # Vélotoile
 
-Mobile app equivalent from Ginko Vélocité
+Alternative app for Ginko Vélocité
 Vélo + étoile = Vélotoile
+
