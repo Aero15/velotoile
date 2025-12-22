@@ -132,7 +132,8 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     stations = filteredStations.value,
                     modifier = Modifier.fillMaxSize(),
                     onStationClick = { station -> selectedStation = station },
-                    sortField = currentSortField.value
+                    sortField = currentSortField.value,
+                    isSearching = isSearching
                 )
             }
             is Resource.Error -> {

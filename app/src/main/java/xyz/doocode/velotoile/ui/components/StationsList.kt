@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.*
+import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
 import xyz.doocode.velotoile.ui.components.search.result.StationItem
 
@@ -15,6 +16,7 @@ fun StationsList(
     stations: List<Station>,
     onStationClick: (Station) -> Unit = {},
     sortField: SortField = SortField.NUMBER,
+    isSearching: Boolean = false,
 ) {
     if (stations.isEmpty()) {
         Box(
@@ -23,7 +25,7 @@ fun StationsList(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Aucune station disponible",
+                text = if (isSearching) "Aucun résultat" else "Aucune station disponible",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -33,6 +35,22 @@ fun StationsList(
             modifier = modifier
                 .fillMaxSize(),
         ) {
+            item {
+                Text(
+                    text = if (isSearching) {
+                        "${stations.size} résultat${if (stations.size > 1) "s" else ""} trouvé${if (stations.size > 1) "s" else ""}"
+                    } else {
+                        "${stations.size} station${if (stations.size > 1) "s" else ""}"
+                    },
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(vertical = 12.dp)
+                )
+            }
+            
             items(stations) { station ->
                 StationItem(
                     station = station,
