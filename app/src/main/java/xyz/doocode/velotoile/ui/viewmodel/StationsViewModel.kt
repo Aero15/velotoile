@@ -86,7 +86,7 @@ class StationsViewModel : ViewModel() {
     }
     
     private fun applyFiltersAndSort(stationsList: List<Station>) {
-        val query = searchQuery.value?.lowercase() ?: ""
+        val query = searchQuery.value?.trim()?.lowercase() ?: ""
         var filtered = stationsList
         
         // Apply search filter
