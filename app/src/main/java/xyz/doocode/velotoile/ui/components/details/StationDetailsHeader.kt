@@ -5,22 +5,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.ChipColors
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.*
 import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 @Composable
 fun StationDetailsHeader(
@@ -153,9 +148,8 @@ private fun StatusChip(
         },
         leadingIcon = {
             Icon(
-                imageVector = Icons.Filled.Warning,
+                imageVector = Icons.Rounded.Warning,
                 contentDescription = label,
-                modifier = Modifier.padding(end = 4.dp),
                 tint = primaryColor
             )
         },
@@ -172,6 +166,16 @@ private fun StatusChip(
         border = null,
         modifier = modifier
     )
+}
+
+@Preview(
+    name = "Status chip",
+)
+@Composable
+private fun StatusChipPreview() {
+    VelotoileTheme {
+        StatusChip(label = "Fermée")
+    }
 }
 
 private fun extractStationName(fullName: String): String {
