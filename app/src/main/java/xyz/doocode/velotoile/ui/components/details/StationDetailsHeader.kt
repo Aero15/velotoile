@@ -4,17 +4,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.core.util.Preferences
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 @Composable
@@ -23,6 +28,10 @@ fun StationDetailsHeader(
     onBackClick: () -> Unit = {},
     onMapsClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val preferences = remember { Preferences(context) }
+    val isFavorite = remember { mutableStateOf(preferences.isFavorite(station.number)) }
+    
     val hasWarning = station.status == "CLOSED" || station.overflow || !station.connected;
     Column(
         modifier = Modifier
@@ -31,13 +40,13 @@ fun StationDetailsHeader(
                 color = Color(0xFFB7007A),
             )
     ) {
-        // Top row with back button, station number and maps button
+        // Top row with back button, station number and favorite button
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
                 .padding(top = 8.dp),
-            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
@@ -58,10 +67,12 @@ fun StationDetailsHeader(
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
 
-            IconButton(onClick = onMapsClick) {
+            IconButton(onClick = {
+                isFavorite.value = preferences.toggleFavorite(station.number)
+            }) {
                 Icon(
-                    imageVector = Icons.Filled.LocationOn,
-                    contentDescription = "Ouvrir sur la carte",
+                    imageVector = if (isFavorite.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    contentDescription = if (isFavorite.value) "Retirer des favoris" else "Ajouter aux favoris",
                     tint = Color.White
                 )
             }
@@ -85,29 +96,6 @@ fun StationDetailsHeader(
                 fontSize = 18.sp
             )
         }
-
-        /*// Address (clickable)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onMapsClick() }
-                .padding(horizontal = 16.dp, vertical = 1.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.LocationOn,
-                contentDescription = "Adresse",
-                tint = Color.White,
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(end = 8.dp)
-            )
-            Text(
-                text = station.address,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.9f)
-            )
-        }*/
 
         // Status and additional chips
         if (hasWarning) {

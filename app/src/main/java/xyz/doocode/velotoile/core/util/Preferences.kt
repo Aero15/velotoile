@@ -13,6 +13,7 @@ class Preferences(private val context: Context) {
         private const val PREFS_NAME = "velotoile_prefs"
         private const val SORT_FIELD_KEY = "sort_field"
         private const val SORT_ORDER_KEY = "sort_order"
+        private const val FAVORITES_KEY = "favorite_stations"
     }
     
     fun getSortField(): SortField {
@@ -51,6 +52,49 @@ class Preferences(private val context: Context) {
         sharedPreferences.edit().apply {
             putString(SORT_FIELD_KEY, field.name)
             putString(SORT_ORDER_KEY, order.name)
+            apply()
+        }
+    }
+    
+    fun getFavoriteStations(): Set<Int> {
+        val favoriteString = sharedPreferences.getString(FAVORITES_KEY, "")
+        return if (favoriteString.isNullOrEmpty()) {
+            emptySet()
+        } else {
+            favoriteString.split(",").mapNotNull { it.toIntOrNull() }.toSet()
+        }
+    }
+    
+    fun isFavorite(stationNumber: Int): Boolean {
+        return getFavoriteStations().contains(stationNumber)
+    }
+    
+    fun addFavorite(stationNumber: Int) {
+        val favorites = getFavoriteStations().toMutableSet()
+        favorites.add(stationNumber)
+        saveFavorites(favorites)
+    }
+    
+    fun removeFavorite(stationNumber: Int) {
+        val favorites = getFavoriteStations().toMutableSet()
+        favorites.remove(stationNumber)
+        saveFavorites(favorites)
+    }
+    
+    fun toggleFavorite(stationNumber: Int): Boolean {
+        return if (isFavorite(stationNumber)) {
+            removeFavorite(stationNumber)
+            false
+        } else {
+            addFavorite(stationNumber)
+            true
+        }
+    }
+    
+    private fun saveFavorites(favorites: Set<Int>) {
+        val favoriteString = favorites.joinToString(",")
+        sharedPreferences.edit().apply {
+            putString(FAVORITES_KEY, favoriteString)
             apply()
         }
     }
