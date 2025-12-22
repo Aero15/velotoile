@@ -23,7 +23,7 @@ import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 fun StationDetailsStandsCard(station: Station) {
     StationDetailsSection(
         icon = Icons.Filled.LocalParking,
-        title = "Places libres (${station.totalStands.availabilities.stands})",
+        title = "Places libres",
     ) {
         Row(
             modifier = Modifier
@@ -91,8 +91,8 @@ private fun StandInfoRow(
         modifier = modifier
             .fillMaxWidth()
             .background(backgroundColor, RoundedCornerShape(8.dp))
-            .padding(horizontal = 16.dp)
-            .padding(vertical = 8.dp)
+            .padding(horizontal = 8.dp)
+            .padding(vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -111,6 +111,26 @@ private fun StandInfoRow(
                 color = textColor
             )
         }
+    }
+}
+
+@Preview(
+    name = "[Light] Row of info",
+    //showBackground = true
+)
+@Preview(
+    name = "[Dark] Row of info",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun StandInfoRowPreview() {
+    VelotoileTheme {
+        StandInfoRow(
+            label = "Libres",
+            value = 6,
+            backgroundColor = MaterialTheme.colorScheme.primary,
+            textColor = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }
 
@@ -148,11 +168,11 @@ fun StandsPieChart(
 }
 
 @Preview(
-    name = "Light mode",
+    name = "[Light] Pie chart",
     showBackground = true
 )
 @Preview(
-    name = "Dark mode",
+    name = "[Dark] Pie chart",
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
