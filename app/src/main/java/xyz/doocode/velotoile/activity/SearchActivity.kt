@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        viewModel.initializePreferences(this)
         viewModel.loadStations()
         viewModel.startAutoRefresh()
 
