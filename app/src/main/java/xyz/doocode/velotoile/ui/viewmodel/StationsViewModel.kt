@@ -24,6 +24,9 @@ class StationsViewModel : ViewModel() {
     private val _sortOrder = MutableLiveData<SortOrder>(SortOrder.ASCENDING)
     val sortOrder: LiveData<SortOrder> = _sortOrder
     
+    private val _showOnlyFavorites = MutableLiveData<Boolean>(false)
+    val showOnlyFavorites: LiveData<Boolean> = _showOnlyFavorites
+    
     private val _filteredStations = MutableLiveData<List<Station>>()
     val filteredStations: LiveData<List<Station>> = _filteredStations
     
@@ -85,9 +88,23 @@ class StationsViewModel : ViewModel() {
         applyFiltersAndSort(currentStations)
     }
     
+    fun toggleFavoritesFilter() {
+        _showOnlyFavorites.value = !(_showOnlyFavorites.value ?: false)
+        val currentStations = (stations.value as? Resource.Success)?.data ?: emptyList()
+        applyFiltersAndSort(currentStations)
+    }
+    
     private fun applyFiltersAndSort(stationsList: List<Station>) {
         val query = searchQuery.value?.trim()?.lowercase() ?: ""
         var filtered = stationsList
+        
+        // Apply favorites filter
+        if (_showOnlyFavorites.value == true) {
+            val favoriteNumbers = preferences?.getFavoriteStations() ?: emptySet()
+            filtered = filtered.filter { station ->
+                station.number in favoriteNumbers
+            }
+        }
         
         // Apply search filter
         if (query.isNotEmpty()) {

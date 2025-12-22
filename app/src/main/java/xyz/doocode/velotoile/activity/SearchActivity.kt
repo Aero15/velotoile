@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,10 +70,10 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     var isSearching by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var selectedStation by remember { mutableStateOf<Station?>(null) }
-    val context = LocalContext.current
     
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
     val searchQuery = viewModel.searchQuery.observeAsState("")
+    val showOnlyFavorites = viewModel.showOnlyFavorites.observeAsState(false)
 
     Column(modifier = modifier.fillMaxSize()) {
         if (!isSearching) {
@@ -83,13 +85,16 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                 windowInsets = WindowInsets(top = 0.dp),
                 title = { Text("Ginko Vélocité") },
                 actions = {
-                    /*IconButton(
-                        onClick = {
-                            Toast.makeText(context, "TODO: Filtres", Toast.LENGTH_SHORT).show()
-                        }
+                    // Bouton pour filtrer les favoris
+                    IconButton(
+                        onClick = { viewModel.toggleFavoritesFilter() }
                     ) {
-                        Icon(Icons.Filled.FilterList, contentDescription = "Filtres")
-                    }*/
+                        Icon(
+                            imageVector = if (showOnlyFavorites.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = if (showOnlyFavorites.value) "Voir toutes les stations" else "Afficher les favoris",
+                            tint = Color.White
+                        )
+                    }
                     
                     IconButton(
                         onClick = { showSortMenu = !showSortMenu }
