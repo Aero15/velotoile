@@ -122,6 +122,7 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
         }
 
         val stationsResource = viewModel.stations.observeAsState()
+        val currentSortField = viewModel.sortField.observeAsState(SortField.NUMBER)
         when (val resource = stationsResource.value) {
             is Resource.Loading -> {
                 // Afficher un loader
@@ -130,7 +131,8 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                 StationsList(
                     stations = filteredStations.value,
                     modifier = Modifier.fillMaxSize(),
-                    onStationClick = { station -> selectedStation = station }
+                    onStationClick = { station -> selectedStation = station },
+                    sortField = currentSortField.value
                 )
             }
             is Resource.Error -> {

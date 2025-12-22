@@ -1,5 +1,6 @@
 package xyz.doocode.velotoile.ui.components
 
+import SortField
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.*
@@ -13,6 +14,7 @@ fun StationsList(
     modifier: Modifier = Modifier,
     stations: List<Station>,
     onStationClick: (Station) -> Unit = {},
+    sortField: SortField = SortField.NUMBER,
 ) {
     if (stations.isEmpty()) {
         Box(
@@ -35,7 +37,9 @@ fun StationsList(
                 StationItem(
                     station = station,
                     onStationClick = onStationClick,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    showMechanicalBikes = sortField == SortField.MECHANICAL_BIKES,
+                    showElectricalBikes = sortField == SortField.ELECTRICAL_BIKES
                 )
             }
         }

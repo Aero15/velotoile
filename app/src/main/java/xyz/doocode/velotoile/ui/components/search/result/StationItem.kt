@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.filled.ElectricBike
 import androidx.compose.material.icons.filled.LocalParking
+import androidx.compose.material.icons.filled.PedalBike
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.*
@@ -22,8 +24,11 @@ import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 fun StationItem(
     station: Station,
     modifier: Modifier = Modifier,
-    onStationClick: (Station) -> Unit = {}
+    onStationClick: (Station) -> Unit = {},
+    showMechanicalBikes: Boolean = false,
+    showElectricalBikes: Boolean = false,
 ) {
+    
     val shape = RoundedCornerShape(0.dp)
     Card(
         modifier = modifier
@@ -64,6 +69,24 @@ fun StationItem(
                     value = station.totalStands.availabilities.bikes.toString(),
                     modifier = Modifier.weight(1f)
                 )
+
+                if (showMechanicalBikes) {
+                    StationInfoItem(
+                        icon = Icons.Filled.PedalBike,
+                        label = "Méca",
+                        value = station.totalStands.availabilities.mechanicalBikes.toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                if (showElectricalBikes) {
+                    StationInfoItem(
+                        icon = Icons.Filled.ElectricBike,
+                        label = "Élec",
+                        value = station.totalStands.availabilities.electricalBikes.toString(),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
                 StationInfoItem(
                     icon = Icons.Filled.LocalParking,
@@ -123,7 +146,9 @@ private fun StationItemPreview() {
 
     VelotoileTheme {
         StationItem(
-            station = station
+            station = station,
+            showMechanicalBikes = true,
+            showElectricalBikes = true,
         )
     }
 }
