@@ -1,5 +1,4 @@
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import xyz.doocode.velotoile.core.dto.Station
+import xyz.doocode.velotoile.core.util.Preferences
 
 class StationsViewModel : ViewModel() {
     private val repository = BikeRepository()
@@ -28,46 +28,20 @@ class StationsViewModel : ViewModel() {
     val filteredStations: LiveData<List<Station>> = _filteredStations
     
     private val REFRESH_INTERVAL = 120_000L // 60 seconds
-    private var sharedPreferences: SharedPreferences? = null
-    
-    companion object {
-        private const val PREFS_NAME = "velotoile_prefs"
-        private const val SORT_FIELD_KEY = "sort_field"
-        private const val SORT_ORDER_KEY = "sort_order"
-    }
+    private var preferences: Preferences? = null
     
     fun initializePreferences(context: Context) {
-        sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        preferences = Preferences(context)
         loadPreferences()
     }
     
     private fun loadPreferences() {
-        sharedPreferences?.let { prefs ->
-            val savedSortFieldName = prefs.getString(SORT_FIELD_KEY, SortField.NUMBER.name)
-            val savedSortOrderName = prefs.getString(SORT_ORDER_KEY, SortOrder.ASCENDING.name)
-            
-            val field = try {
-                SortField.valueOf(savedSortFieldName ?: SortField.NUMBER.name)
-            } catch (e: IllegalArgumentException) {
-                SortField.NUMBER
-            }
-            
-            val order = try {
-                SortOrder.valueOf(savedSortOrderName ?: SortOrder.ASCENDING.name)
-            } catch (e: IllegalArgumentException) {
-                SortOrder.ASCENDING
-            }
+        preferences?.let { prefManager ->
+            val field = prefManager.getSortField()
+            val order = prefManager.getSortOrder()
             
             _sortField.value = field
             _sortOrder.value = order
-        }
-    }
-    
-    private fun savePreferences() {
-        sharedPreferences?.edit()?.apply {
-            putString(SORT_FIELD_KEY, _sortField.value?.name ?: SortField.NUMBER.name)
-            putString(SORT_ORDER_KEY, _sortOrder.value?.name ?: SortOrder.ASCENDING.name)
-            apply()
         }
     }
     
@@ -99,14 +73,14 @@ class StationsViewModel : ViewModel() {
     
     fun setSortField(field: SortField) {
         _sortField.value = field
-        savePreferences()
+        preferences?.setSortField(field)
         val currentStations = (stations.value as? Resource.Success)?.data ?: emptyList()
         applyFiltersAndSort(currentStations)
     }
     
     fun setSortOrder(order: SortOrder) {
         _sortOrder.value = order
-        savePreferences()
+        preferences?.setSortOrder(order)
         val currentStations = (stations.value as? Resource.Success)?.data ?: emptyList()
         applyFiltersAndSort(currentStations)
     }
