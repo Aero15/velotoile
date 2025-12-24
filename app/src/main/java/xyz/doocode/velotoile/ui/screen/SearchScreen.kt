@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,6 +30,8 @@ import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.core.dto.Station
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,16 +52,15 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     containerColor = Color(0xFF00999d), // light:00abc4, dark:00999d
                 ),
                 windowInsets = WindowInsets(top = 0.dp),
-                title = { Text("Ginko Vélocité") },
+                title = { Text("Recherche") },
                 actions = {
                     // Bouton pour filtrer les favoris
                     IconButton(
                         onClick = { viewModel.toggleFavoritesFilter() }
                     ) {
                         Icon(
-                            imageVector = if (showOnlyFavorites.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            imageVector = if (showOnlyFavorites.value) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                             contentDescription = if (showOnlyFavorites.value) "Voir toutes les stations" else "Afficher les favoris",
-                            tint = Color.White
                         )
                     }
                     
