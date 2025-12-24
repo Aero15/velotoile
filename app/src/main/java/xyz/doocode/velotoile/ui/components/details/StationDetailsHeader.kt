@@ -26,7 +26,8 @@ import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 fun StationDetailsHeader(
     station: Station,
     onBackClick: () -> Unit = {},
-    onMapsClick: () -> Unit = {}
+    onMapsClick: () -> Unit = {},
+    onToggleFavorite: (Int) -> Unit = {}
 ) {
     val context = LocalContext.current
     val preferences = remember { Preferences(context) }
@@ -68,7 +69,9 @@ fun StationDetailsHeader(
             )
 
             IconButton(onClick = {
-                isFavorite.value = preferences.toggleFavorite(station.number)
+                // Use provided callback to toggle favorite in ViewModel / owner, then refresh local state
+                onToggleFavorite(station.number)
+                isFavorite.value = preferences.isFavorite(station.number)
             }) {
                 Icon(
                     imageVector = if (isFavorite.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,

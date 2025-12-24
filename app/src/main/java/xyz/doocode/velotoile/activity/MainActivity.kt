@@ -1,6 +1,5 @@
 package xyz.doocode.velotoile.activity
 
-import StationsViewModel
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.FavoriteBorder
@@ -36,9 +34,11 @@ import xyz.doocode.velotoile.ui.screen.BookmarksScreen
 import xyz.doocode.velotoile.ui.screen.SearchScreen
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import androidx.activity.viewModels
-import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
+import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel: StationsViewModel by viewModels()
@@ -75,7 +75,9 @@ fun TestNavBarApp(viewModel: StationsViewModel) {
                     },
                     label = { Text(it.label) },
                     selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    onClick = {
+                        currentDestination = it
+                    }
                 )
             }
         },
@@ -95,7 +97,7 @@ fun TestNavBarApp(viewModel: StationsViewModel) {
                     when (destination) {
                         AppDestinations.HOME -> HomeScreen()
                         AppDestinations.SEARCH -> SearchScreen(viewModel = viewModel, modifier = Modifier.fillMaxSize())
-                        AppDestinations.BOOKMARKS -> BookmarksScreen()
+                        AppDestinations.BOOKMARKS -> BookmarksScreen(viewModel = viewModel)
                         AppDestinations.MENU -> MenuScreen()
                     }
                 }
@@ -109,7 +111,7 @@ enum class AppDestinations(
     val icon: ImageVector,
     val selectedIcon: ImageVector
 ) {
-    HOME("Home", Icons.Rounded.Home, Icons.Filled.Home),
+    HOME("Home", Icons.Outlined.Home, Icons.Filled.Home),
     SEARCH("Search", Icons.Rounded.Search, Icons.Filled.Search),
     BOOKMARKS("Bookmarks", Icons.Rounded.FavoriteBorder, Icons.Filled.Favorite),
     MENU("Menu", Icons.Rounded.Menu, Icons.Filled.Menu),

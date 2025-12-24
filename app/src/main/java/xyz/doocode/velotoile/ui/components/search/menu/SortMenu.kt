@@ -1,6 +1,5 @@
 package xyz.doocode.velotoile.ui.components.search.menu
 
-import StationsViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
@@ -10,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
 import androidx.compose.ui.unit.*
+import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 
 @Composable
 fun SortMenu(

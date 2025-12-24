@@ -1,6 +1,5 @@
 package xyz.doocode.velotoile.ui.screen
 
-import StationsViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,8 +29,7 @@ import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.core.dto.Station
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
+import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +40,6 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
     val searchQuery = viewModel.searchQuery.observeAsState("")
-    val showOnlyFavorites = viewModel.showOnlyFavorites.observeAsState(false)
 
     Column(modifier = modifier.fillMaxSize()) {
         if (!isSearching) {
@@ -54,17 +51,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                 windowInsets = WindowInsets(top = 0.dp),
                 title = { Text("Recherche") },
                 actions = {
-                    // Bouton pour filtrer les favoris
-                    IconButton(
-                        onClick = { viewModel.toggleFavoritesFilter() }
-                    ) {
-                        Icon(
-                            imageVector = if (showOnlyFavorites.value) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                            contentDescription = if (showOnlyFavorites.value) "Voir toutes les stations" else "Afficher les favoris",
-                        )
-                    }
-                    
-                    IconButton(
+                        IconButton(
                         onClick = { showSortMenu = !showSortMenu }
                     ) {
                         Icon(Icons.Filled.SortByAlpha, contentDescription = "Tri")
@@ -98,11 +85,11 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
         val stationsResource = viewModel.stations.observeAsState()
         val currentSortField = viewModel.sortField.observeAsState(SortField.NUMBER)
         when (val resource = stationsResource.value) {
-            is Resource.Loading -> {
+            is Resource.Loading<*> -> {
                 // Afficher un loader
                 Box(modifier = Modifier.fillMaxSize())
             }
-            is Resource.Success -> {
+            is Resource.Success<*> -> {
                 StationsList(
                     stations = filteredStations.value,
                     modifier = Modifier.fillMaxSize(),
@@ -111,7 +98,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     isSearching = isSearching
                 )
             }
-            is Resource.Error -> {
+            is Resource.Error<*> -> {
                 // Afficher l'erreur
             }
             else -> {
@@ -123,6 +110,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     // Station details sheet
     StationDetailsSheet(
         station = selectedStation,
-        onDismiss = { selectedStation = null }
+        onDismiss = { selectedStation = null },
+        onToggleFavorite = { stationNumber -> viewModel.toggleFavorite(stationNumber) }
     )
 }

@@ -38,7 +38,8 @@ import xyz.doocode.velotoile.core.util.openMapsIntent
 fun StationDetailsSheet(
     station: Station?,
     onDismiss: () -> Unit,
-    sheetState: SheetState = rememberModalBottomSheetState()
+    sheetState: SheetState = rememberModalBottomSheetState(),
+    onToggleFavorite: (Int) -> Unit = {}
 ) {
     if (station != null) {
         val context = LocalContext.current
@@ -71,7 +72,8 @@ fun StationDetailsSheet(
                 StationDetailsHeader(
                     station = station,
                     onBackClick = onDismiss,
-                    onMapsClick = { openMapsIntent(context, station) }
+                    onMapsClick = { openMapsIntent(context, station) },
+                    onToggleFavorite = onToggleFavorite
                 )
 
                 // Recap tiles (mechanical bikes, electric bikes, available stands)

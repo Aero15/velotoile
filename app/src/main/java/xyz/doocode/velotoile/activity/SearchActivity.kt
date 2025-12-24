@@ -1,25 +1,20 @@
 package xyz.doocode.velotoile.activity
 
-import StationsViewModel
+import Resource
+import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -70,17 +65,6 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                 windowInsets = WindowInsets(top = 0.dp),
                 title = { Text("Ginko Vélocité") },
                 actions = {
-                    // Bouton pour filtrer les favoris
-                    IconButton(
-                        onClick = { viewModel.toggleFavoritesFilter() }
-                    ) {
-                        Icon(
-                            imageVector = if (showOnlyFavorites.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = if (showOnlyFavorites.value) "Voir toutes les stations" else "Afficher les favoris",
-                            tint = Color.White
-                        )
-                    }
-                    
                     IconButton(
                         onClick = { showSortMenu = !showSortMenu }
                     ) {
@@ -115,10 +99,10 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
         val stationsResource = viewModel.stations.observeAsState()
         val currentSortField = viewModel.sortField.observeAsState(SortField.NUMBER)
         when (val resource = stationsResource.value) {
-            is Resource.Loading -> {
+            is Resource.Loading<*> -> {
                 // Afficher un loader
             }
-            is Resource.Success -> {
+            is Resource.Success<*> -> {
                 StationsList(
                     stations = filteredStations.value,
                     modifier = Modifier.fillMaxSize(),
@@ -127,7 +111,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     isSearching = isSearching
                 )
             }
-            is Resource.Error -> {
+            is Resource.Error<*> -> {
                 // Afficher l'erreur
             }
             else -> {
@@ -139,6 +123,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     // Station details sheet
     StationDetailsSheet(
         station = selectedStation,
-        onDismiss = { selectedStation = null }
+        onDismiss = { selectedStation = null },
+        onToggleFavorite = { stationNumber -> viewModel.toggleFavorite(stationNumber) }
     )
 }
