@@ -41,26 +41,11 @@ import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 class SearchActivity : ComponentActivity() {
-    private val viewModel: StationsViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-
-        viewModel.initializePreferences(this)
-        viewModel.loadStations()
-        viewModel.startAutoRefresh()
-
-        setContent {
-            VelotoileTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    SearchScreen(
-                        viewModel = viewModel,
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
+        // Redirect to MainActivity (Search is now in MainActivity)
+        startActivity(android.content.Intent(this, MainActivity::class.java))
+        finish()
     }
 }
 

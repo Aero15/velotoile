@@ -1,5 +1,6 @@
 package xyz.doocode.velotoile.activity
 
+import StationsViewModel
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,10 +10,11 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,14 +35,24 @@ import androidx.compose.ui.unit.*
 import xyz.doocode.velotoile.ui.screen.BookmarksScreen
 import xyz.doocode.velotoile.ui.screen.SearchScreen
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
+import androidx.activity.viewModels
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Search
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: StationsViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        viewModel.initializePreferences(this)
+        viewModel.loadStations()
+        viewModel.startAutoRefresh()
+
         setContent {
             VelotoileTheme {
-                TestNavBarApp()
+                TestNavBarApp(viewModel)
             }
         }
     }
@@ -48,7 +60,7 @@ class MainActivity : ComponentActivity() {
 
 @PreviewScreenSizes
 @Composable
-fun TestNavBarApp() {
+fun TestNavBarApp(viewModel: StationsViewModel) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -57,7 +69,7 @@ fun TestNavBarApp() {
                 item(
                     icon = {
                         Icon(
-                            it.icon,
+                            if (it == currentDestination) it.selectedIcon else it.icon,
                             contentDescription = it.label
                         )
                     },
@@ -82,7 +94,7 @@ fun TestNavBarApp() {
                 ) { destination ->
                     when (destination) {
                         AppDestinations.HOME -> HomeScreen()
-                        AppDestinations.SEARCH -> SearchScreen()
+                        AppDestinations.SEARCH -> SearchScreen(viewModel = viewModel, modifier = Modifier.fillMaxSize())
                         AppDestinations.BOOKMARKS -> BookmarksScreen()
                         AppDestinations.MENU -> MenuScreen()
                     }
@@ -95,11 +107,12 @@ fun TestNavBarApp() {
 enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
+    val selectedIcon: ImageVector
 ) {
-    HOME("Home", Icons.Outlined.Home),
-    SEARCH("Search", Icons.Outlined.Search),
-    BOOKMARKS("Bookmarks", Icons.Outlined.Favorite),
-    MENU("Menu", Icons.Outlined.Menu),
+    HOME("Home", Icons.Rounded.Home, Icons.Filled.Home),
+    SEARCH("Search", Icons.Rounded.Search, Icons.Filled.Search),
+    BOOKMARKS("Bookmarks", Icons.Rounded.FavoriteBorder, Icons.Filled.Favorite),
+    MENU("Menu", Icons.Rounded.Menu, Icons.Filled.Menu),
 }
 
 @Composable
