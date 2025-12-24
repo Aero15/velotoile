@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,8 +30,8 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
     var showSortMenu by remember { mutableStateOf(false) }
     var selectedStation by remember { mutableStateOf<Station?>(null) }
 
-    val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
-    val searchQuery = viewModel.searchQuery.observeAsState("")
+    // Local search state for bookmarks (do not modify the global search query)
+    var bookmarkSearchQuery by rememberSaveable { mutableStateOf("") }
 
 
 
@@ -75,35 +76,41 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
         } else {
             SearchBar(
                 transparent = true,
-                searchQuery = searchQuery.value,
-                onSearchQueryChanged = { viewModel.setSearchQuery(it) },
-                onCloseSearch = { isSearching = false },
+                searchQuery = bookmarkSearchQuery,
+                onSearchQueryChanged = { bookmarkSearchQuery = it },
+                onCloseSearch = { isSearching = false; bookmarkSearchQuery = "" },
                 modifier = Modifier
                     .background(Color(0xFF00999d))
             )
         }
 
-        // Small info line to verify favorites are loaded correctly
-        Text(
-            text = "${favoriteStations.value.size} stations favorites",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
+        // Apply local search filter to favorites
+        val displayedFavorites = if (bookmarkSearchQuery.trim().isNotEmpty()) {
+            val q = bookmarkSearchQuery.trim().lowercase()
+            favoriteStations.value.filter { station ->
+                station.name.lowercase().contains(q) || station.address.lowercase().contains(q)
+            }
+        } else {
+            favoriteStations.value
+        }
 
-        when (favoriteStations.value.isEmpty()) {
+        when (displayedFavorites.isEmpty()) {
             true -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Aucun favori", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = if (isSearching) "Aucun résultat" else "Aucun favori",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
             false -> {
                 StationsList(
-                    stations = favoriteStations.value,
+                    stations = displayedFavorites,
                     modifier = Modifier.fillMaxSize(),
                     onStationClick = { station -> selectedStation = station },
                     sortField = currentSortField.value,
-                    isSearching = false
+                    isSearching = isSearching
                 )
             }
         }
