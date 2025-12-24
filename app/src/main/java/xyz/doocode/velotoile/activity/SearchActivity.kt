@@ -16,6 +16,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -90,9 +92,8 @@ fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                         onClick = { viewModel.toggleFavoritesFilter() }
                     ) {
                         Icon(
-                            imageVector = if (showOnlyFavorites.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = if (showOnlyFavorites.value) "Voir toutes les stations" else "Afficher les favoris",
-                            tint = Color.White
+                            imageVector = if (showOnlyFavorites.value) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                            contentDescription = if (showOnlyFavorites.value) "Voir toutes les stations" else "Afficher les favoris"
                         )
                     }
                     
