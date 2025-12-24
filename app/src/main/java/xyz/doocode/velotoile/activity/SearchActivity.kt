@@ -40,7 +40,7 @@ import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
-class MainActivity : ComponentActivity() {
+class SearchActivity : ComponentActivity() {
     private val viewModel: StationsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             VelotoileTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(
+                    SearchScreen(
                         viewModel = viewModel,
                         modifier = Modifier.padding(innerPadding)
                     )
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
+fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     var isSearching by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var selectedStation by remember { mutableStateOf<Station?>(null) }
