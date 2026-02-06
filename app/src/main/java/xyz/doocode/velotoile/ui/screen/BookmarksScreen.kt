@@ -25,6 +25,10 @@ import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.search.menu.SortMenu
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +44,25 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
     // Refresh state
     val isRefreshing = stationsResource.value is Resource.Loading
     
+    // Rate limiting & Snackbar state
+    var lastRefreshTime by rememberSaveable { mutableLongStateOf(0L) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // Watch for refresh completion to show success message
+    var wasRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(isRefreshing) {
+        if (wasRefreshing && !isRefreshing) {
+            if (stationsResource.value is Resource.Success<*>) {
+                val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+                scope.launch {
+                    snackbarHostState.showSnackbar("Mis à jour à l'instant ($time)")
+                }
+            }
+        }
+        wasRefreshing = isRefreshing
+    }
+
     // Filter logic
     val displayedFavorites = remember(favoriteStations.value, bookmarkSearchQuery) {
         if (bookmarkSearchQuery.trim().isNotEmpty()) {
@@ -52,7 +75,8 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
         }
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
         // App Bar
         if (!isSearching) {
             TopAppBar(
@@ -91,7 +115,18 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
         // Main Content with PullToRefresh
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = { viewModel.loadStations() },
+            onRefresh = {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastRefreshTime < 15_000) {
+                    scope.launch {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        snackbarHostState.showSnackbar("Veuillez réessayer ultérieurement.")
+                    }
+                } else {
+                    lastRefreshTime = currentTime
+                    viewModel.loadStations()
+                }
+            },
             modifier = Modifier.fillMaxSize()
         ) {
             if (displayedFavorites.isEmpty()) {
@@ -125,7 +160,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
             } else {
                 // Dashboard Grid
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 160.dp),
+                    columns = GridCells.Adaptive(minSize = 150.dp),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -144,6 +179,14 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                 }
             }
         }
+    }
+
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(16.dp)
+    )
     }
 
     // Station Details Bundle
