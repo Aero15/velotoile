@@ -13,12 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -55,7 +52,6 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
     val searchQuery = viewModel.searchQuery.observeAsState("")
-    val showOnlyFavorites = viewModel.showOnlyFavorites.observeAsState(false)
 
     Column(modifier = modifier.fillMaxSize()) {
         if (!isSearching) {
@@ -67,16 +63,6 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                 windowInsets = WindowInsets(top = 0.dp),
                 title = { Text("Ginko Vélocité") },
                 actions = {
-                    // Bouton pour filtrer les favoris
-                    IconButton(
-                        onClick = { viewModel.toggleFavoritesFilter() }
-                    ) {
-                        Icon(
-                            imageVector = if (showOnlyFavorites.value) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                            contentDescription = if (showOnlyFavorites.value) "Voir toutes les stations" else "Afficher les favoris"
-                        )
-                    }
-                    
                     IconButton(
                         onClick = { showSortMenu = !showSortMenu }
                     ) {

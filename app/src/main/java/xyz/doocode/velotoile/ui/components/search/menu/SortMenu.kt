@@ -1,11 +1,12 @@
 package xyz.doocode.velotoile.ui.components.search.menu
 
 import SortField
-import StationsViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.ElectricBike
 import androidx.compose.material.icons.filled.LocalParking
 import androidx.compose.material.icons.filled.PedalBike
@@ -71,7 +72,9 @@ fun SortMenu(
             val sortOptions = listOf(
                 SortOption("Nom", SortField.NAME, Icons.Default.TextFields),
                 SortOption("Numéro", SortField.NUMBER, Icons.Default.Tag),
-                SortOption("Nombre de vélos", SortField.TOTAL_BIKES, Icons.Default.Pin),
+                SortOption("Vélos disponibles", SortField.TOTAL_BIKES,
+                    Icons.AutoMirrored.Filled.DirectionsBike
+                ),
                 SortOption("Vélos mécaniques", SortField.MECHANICAL_BIKES, Icons.Filled.PedalBike),
                 SortOption("Vélos électriques", SortField.ELECTRICAL_BIKES, Icons.Filled.ElectricBike),
                 SortOption("Nombre de places", SortField.AVAILABLE_STANDS, Icons.Filled.LocalParking)
