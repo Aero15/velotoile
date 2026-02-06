@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -52,15 +53,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             VelotoileTheme {
-                TestNavBarApp(viewModel)
+                NavBarApp(viewModel)
             }
         }
     }
 }
 
-@PreviewScreenSizes
+//@PreviewScreenSizes
 @Composable
-fun TestNavBarApp(viewModel: StationsViewModel) {
+fun NavBarApp(viewModel: StationsViewModel) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -90,8 +91,15 @@ fun TestNavBarApp(viewModel: StationsViewModel) {
                 AnimatedContent(
                     targetState = currentDestination,
                     transitionSpec = {
-                        slideInHorizontally { it } + fadeIn() togetherWith
-                        slideOutHorizontally { -it } + fadeOut()
+                        val direction = if (targetState.ordinal > initialState.ordinal) 1 else -1
+                        slideInHorizontally(
+                            animationSpec = tween(durationMillis = 250),
+                            initialOffsetX = { it * direction }
+                        ) + fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
+                        slideOutHorizontally(
+                            animationSpec = tween(durationMillis = 250),
+                            targetOffsetX = { -it * direction }
+                        ) + fadeOut(animationSpec = tween(durationMillis = 100))
                     }
                 ) { destination ->
                     when (destination) {
