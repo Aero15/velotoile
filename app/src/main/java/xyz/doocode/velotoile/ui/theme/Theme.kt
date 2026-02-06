@@ -1,6 +1,5 @@
 package xyz.doocode.velotoile.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,6 +8,11 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -33,6 +37,14 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+@Immutable
+data class VelotoileColors(
+    val stationHeaderBackground: Color = Color.Unspecified,
+    val topBarBackground: Color = Color.Unspecified
+)
+
+val LocalVelotoileColors = staticCompositionLocalOf { VelotoileColors() }
+
 @Composable
 fun VelotoileTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -50,9 +62,32 @@ fun VelotoileTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    val customColors = if (darkTheme) {
+        VelotoileColors(
+            stationHeaderBackground = GinkoPink,
+            topBarBackground = GinkoTeal
+        )
+    } else {
+        VelotoileColors(
+            stationHeaderBackground = GinkoPink,
+            topBarBackground = GinkoTealBright
+        )
+    }
+
+    CompositionLocalProvider(
+        LocalVelotoileColors provides customColors
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
+}
+
+object VelotoileTheme {
+    val colors: VelotoileColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalVelotoileColors.current
 }

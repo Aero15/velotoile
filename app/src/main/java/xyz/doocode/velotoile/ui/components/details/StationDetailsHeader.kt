@@ -38,7 +38,7 @@ fun StationDetailsHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = Color(0xFFB7007A),
+                color = VelotoileTheme.colors.stationHeaderBackground,
             )
     ) {
         // Top row with back button, station number and favorite button
@@ -127,7 +127,7 @@ private fun StatusChip(
     label: String,
     modifier: Modifier = Modifier
 ) {
-    val primaryColor = Color(0xFFB7007A)
+    val primaryColor = VelotoileTheme.colors.stationHeaderBackground
     AssistChip(
         onClick = { },
         label = {

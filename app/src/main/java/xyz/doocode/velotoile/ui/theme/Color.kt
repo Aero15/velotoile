@@ -14,3 +14,7 @@ val Pink40 = Color(0xFF7D5260)
 val MechanicalBikeBlue = Color(0xFF1447E6)
 val ElectricBikeGreen = Color(0xFF008236)
 val AvailableStandsYellow = Color(0xFFA65F00)
+
+val GinkoPink = Color(0xFFB7007A)
+val GinkoTealBright = Color(0xFF41C9DE)
+val GinkoTeal = Color(0xFF00abc4)

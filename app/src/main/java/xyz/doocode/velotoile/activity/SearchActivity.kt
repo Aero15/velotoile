@@ -5,6 +5,7 @@ import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
+import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -26,14 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
 import xyz.doocode.velotoile.ui.components.search.menu.SortMenu
 import xyz.doocode.velotoile.ui.components.StationsList
 import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
-import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 
 class SearchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +54,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
             TopAppBar(
                 modifier = Modifier.padding(0.dp),
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF00999d), // light:00abc4, dark:00999d
+                    containerColor = VelotoileTheme.colors.topBarBackground,
                 ),
                 windowInsets = WindowInsets(top = 0.dp),
                 title = { Text("Ginko Vélocité") },

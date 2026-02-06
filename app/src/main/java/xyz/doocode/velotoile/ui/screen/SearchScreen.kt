@@ -1,6 +1,7 @@
 package xyz.doocode.velotoile.ui.screen
 
 import androidx.compose.foundation.background
+import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.WindowInsets
@@ -46,7 +47,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
             TopAppBar(
                 modifier = Modifier.padding(0.dp),
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF00999d), // light:00abc4, dark:00999d
+                    containerColor = VelotoileTheme.colors.topBarBackground,
                 ),
                 windowInsets = WindowInsets(top = 0.dp),
                 title = { Text("Recherche") },
