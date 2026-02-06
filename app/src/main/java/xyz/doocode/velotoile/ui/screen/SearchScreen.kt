@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -23,17 +22,11 @@ import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.core.dto.Station
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.core.content.ContextCompat
-import kotlinx.coroutines.launch
 import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
+import xyz.doocode.velotoile.ui.components.common.LocationFab
+import xyz.doocode.velotoile.ui.components.common.RateLimitedPullToRefresh
+import xyz.doocode.velotoile.ui.components.common.RefreshSuccessObserver
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,43 +38,14 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
     val searchQuery = viewModel.searchQuery.observeAsState("")
     
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // Function to get location and sort
-    fun refreshLocationAndSort() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        ) {
-             try {
-                val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) 
-                    ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                
-                lastKnownLocation?.let {
-                    viewModel.updateUserLocation(it)
-                    viewModel.setSortField(SortField.PROXIMITY)
-                    scope.launch { snackbarHostState.showSnackbar("Tri par proximité activé") }
-                } ?: run {
-                     scope.launch { snackbarHostState.showSnackbar("Impossible de récupérer la position") }
-                }
-            } catch (e: Exception) {
-                 e.printStackTrace()
-            }
-        }
-    }
-
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true || 
-            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
-            refreshLocationAndSort()
-        } else {
-             scope.launch { snackbarHostState.showSnackbar("Permission de localisation nécessaire") }
-        }
-    }
+    val stationsResource = viewModel.stations.observeAsState()
+    
+    RefreshSuccessObserver(
+        isRefreshing = stationsResource.value is Resource.Loading,
+        resource = stationsResource.value,
+        snackbarHostState = snackbarHostState
+    )
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -125,49 +89,46 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
             )
         }
 
-        val stationsResource = viewModel.stations.observeAsState()
         val currentSortField = viewModel.sortField.observeAsState(SortField.NUMBER)
-        when (val resource = stationsResource.value) {
-            is Resource.Loading<*> -> {
-                // Afficher un loader
-                Box(modifier = Modifier.fillMaxSize())
-            }
-            is Resource.Success<*> -> {
-                StationsList(
-                    stations = filteredStations.value,
-                    modifier = Modifier.fillMaxSize(),
-                    onStationClick = { station -> selectedStation = station },
-                    sortField = currentSortField.value,
-                    isSearching = isSearching,
-                    contentPadding = PaddingValues(bottom = 80.dp)
-                )
-            }
-            is Resource.Error<*> -> {
-                // Afficher l'erreur
-            }
-            else -> {
-                // État initial
+        
+        RateLimitedPullToRefresh(
+            isRefreshing = stationsResource.value is Resource.Loading,
+            onRefresh = { viewModel.loadStations() },
+            snackbarHostState = snackbarHostState,
+            modifier = Modifier.weight(1f)
+        ) {
+            when (val resource = stationsResource.value) {
+                is Resource.Loading<*> -> {
+                    // Afficher un loader
+                    Box(modifier = Modifier.fillMaxSize())
+                }
+                is Resource.Success<*> -> {
+                    StationsList(
+                        stations = filteredStations.value,
+                        modifier = Modifier.fillMaxSize(),
+                        onStationClick = { station -> selectedStation = station },
+                        sortField = currentSortField.value,
+                        isSearching = isSearching,
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    )
+                }
+                is Resource.Error<*> -> {
+                    // Afficher l'erreur
+                }
+                else -> {
+                    // État initial
+                }
             }
         }
     }
 
-    FloatingActionButton(
-        onClick = {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-            ) {
-                refreshLocationAndSort()
-            } else {
-                locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-            }
-        },
+    LocationFab(
+        viewModel = viewModel,
+        snackbarHostState = snackbarHostState,
         modifier = Modifier
             .align(Alignment.BottomEnd)
-            .padding(bottom = 16.dp, end = 16.dp),
-        containerColor = MaterialTheme.colorScheme.primaryContainer
-    ) {
-        Icon(Icons.Filled.MyLocation, contentDescription = "Localisation")
-    }
+            .padding(bottom = 16.dp, end = 16.dp)
+    )
 
     SnackbarHost(
         hostState = snackbarHostState,

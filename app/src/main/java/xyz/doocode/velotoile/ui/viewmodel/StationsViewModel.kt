@@ -127,12 +127,6 @@ class StationsViewModel : ViewModel() {
         updateFavoriteStations()
     }
 
-    fun toggleFavoritesFilter() {
-        _showOnlyFavorites.value = !(_showOnlyFavorites.value ?: false)
-        val currentStations = (stations.value as? Resource.Success)?.data ?: emptyList()
-        applyFiltersAndSort(currentStations)
-    }
-
     /** Toggle favorite status for a station and update cached favorite list. Returns new favorite state. */
     fun toggleFavorite(stationNumber: Int): Boolean {
         val newState = preferences?.toggleFavorite(stationNumber) ?: false
