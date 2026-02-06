@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -58,7 +59,9 @@ fun FavoriteStationTile(
         else -> Color(0xFF388E3C) // Green for good
     }
     
-    val containerColor = MaterialTheme.colorScheme.surfaceContainer
+    val surfaceColor = MaterialTheme.colorScheme.surfaceContainer
+    val topColor = backgroundColor.copy(alpha = 0.4f).compositeOver(surfaceColor)
+    val bottomColor = backgroundColor.copy(alpha = 0.1f).compositeOver(surfaceColor)
     
     Card(
         modifier = modifier
@@ -72,10 +75,18 @@ fun FavoriteStationTile(
                     showMenu = true
                 }
             ),
-        colors = CardDefaults.cardColors(containerColor = containerColor),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(topColor, bottomColor)
+                    )
+                )
+        ) {
             
             // Status bar at top or background hint
             Box(
@@ -100,7 +111,7 @@ fun FavoriteStationTile(
                 ) {
                     Text(
                         text = formatStationName(station.name),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,

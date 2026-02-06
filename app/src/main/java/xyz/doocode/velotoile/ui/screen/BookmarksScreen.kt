@@ -23,7 +23,6 @@ import xyz.doocode.velotoile.ui.components.dashboard.FavoriteStationTile
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.search.menu.SortMenu
-import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -160,7 +159,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
             } else {
                 // Dashboard Grid
                 LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 150.dp),
+                    columns = GridCells.Adaptive(minSize = 140.dp),
                     contentPadding = PaddingValues(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
