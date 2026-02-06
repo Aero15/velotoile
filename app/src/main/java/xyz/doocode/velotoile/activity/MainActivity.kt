@@ -130,7 +130,7 @@ enum class AppDestinations(
 ) {
     HOME("Home", Icons.Outlined.Home, Icons.Filled.Home),
     SEARCH("Search", Icons.Rounded.Search, Icons.Filled.Search),
-    BOOKMARKS("Bookmarks", Icons.Rounded.FavoriteBorder, Icons.Filled.Favorite),
+    BOOKMARKS("Favorites", Icons.Rounded.FavoriteBorder, Icons.Filled.Favorite),
     MENU("Menu", Icons.Rounded.Menu, Icons.Filled.Menu),
 }
 

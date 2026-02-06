@@ -1,62 +1,68 @@
 package xyz.doocode.velotoile.ui.screen
 
 import androidx.compose.foundation.background
-import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
-import xyz.doocode.velotoile.ui.components.StationsList
+import xyz.doocode.velotoile.ui.components.dashboard.FavoriteStationTile
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.search.menu.SortMenu
+import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
-
-
     var isSearching by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var selectedStation by remember { mutableStateOf<Station?>(null) }
-
-    // Local search state for bookmarks (do not modify the global search query)
     var bookmarkSearchQuery by rememberSaveable { mutableStateOf("") }
 
-
-
-
-
-
-
     val favoriteStations = viewModel.favoriteStations.observeAsState(emptyList())
-    val favoriteNumbers = viewModel.favoriteNumbers.observeAsState(emptySet())
-    val currentSortField = viewModel.sortField.observeAsState(SortField.NUMBER)
+    val stationsResource = viewModel.stations.observeAsState()
+    
+    // Refresh state
+    val isRefreshing = stationsResource.value is Resource.Loading
+    
+    // Filter logic
+    val displayedFavorites = remember(favoriteStations.value, bookmarkSearchQuery) {
+        if (bookmarkSearchQuery.trim().isNotEmpty()) {
+            val q = bookmarkSearchQuery.trim().lowercase()
+            favoriteStations.value.filter { station ->
+                station.name.lowercase().contains(q) || station.address.lowercase().contains(q)
+            }
+        } else {
+            favoriteStations.value
+        }
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
+        // App Bar
         if (!isSearching) {
             TopAppBar(
-                modifier = Modifier.padding(0.dp),
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = VelotoileTheme.colors.topBarBackground,
                 ),
+                title = { Text("Favorites") },
                 windowInsets = WindowInsets(top = 0.dp),
-                title = { Text("Favoris") },
                 actions = {
-                    IconButton(
-                        onClick = { showSortMenu = !showSortMenu }
-                    ) {
+                    IconButton(onClick = { showSortMenu = !showSortMenu }) {
                         Icon(Icons.Filled.SortByAlpha, contentDescription = "Tri")
                     }
 
@@ -67,9 +73,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                         modifier = Modifier.padding(top = 32.dp)
                     )
 
-                    IconButton(
-                        onClick = { isSearching = !isSearching }
-                    ) {
+                    IconButton(onClick = { isSearching = !isSearching }) {
                         Icon(Icons.Filled.Search, contentDescription = "Recherche")
                     }
                 }
@@ -80,47 +84,74 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                 searchQuery = bookmarkSearchQuery,
                 onSearchQueryChanged = { bookmarkSearchQuery = it },
                 onCloseSearch = { isSearching = false; bookmarkSearchQuery = "" },
-                modifier = Modifier
-                    .background(Color(0xFF00999d))
+                modifier = Modifier.background(Color(0xFF00999d))
             )
         }
 
-        // Apply local search filter to favorites
-        val displayedFavorites = if (bookmarkSearchQuery.trim().isNotEmpty()) {
-            val q = bookmarkSearchQuery.trim().lowercase()
-            favoriteStations.value.filter { station ->
-                station.name.lowercase().contains(q) || station.address.lowercase().contains(q)
-            }
-        } else {
-            favoriteStations.value
-        }
-
-        when (displayedFavorites.isEmpty()) {
-            true -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = if (isSearching) "Aucun résultat" else "Aucun favori",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+        // Main Content with PullToRefresh
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = { viewModel.loadStations() },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (displayedFavorites.isEmpty()) {
+                // Empty State
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = if (bookmarkSearchQuery.isNotEmpty()) "Aucun résultat" else "Aucun favori",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (bookmarkSearchQuery.isEmpty()) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Ajoutez des stations favorites depuis la recherche pour les voir ici.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
-            }
-            false -> {
-                StationsList(
-                    stations = displayedFavorites,
-                    modifier = Modifier.fillMaxSize(),
-                    onStationClick = { station -> selectedStation = station },
-                    sortField = currentSortField.value,
-                    isSearching = isSearching
-                )
+            } else {
+                // Dashboard Grid
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 160.dp),
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(
+                        items = displayedFavorites,
+                        key = { it.number }
+                    ) { station ->
+                        FavoriteStationTile(
+                            station = station,
+                            onClick = { selectedStation = station },
+                            onUnfavorite = { viewModel.toggleFavorite(station.number) }
+                        )
+                    }
+                }
             }
         }
     }
 
-    // Station details sheet (allow un-favoriting from details)
-    StationDetailsSheet(
-        station = selectedStation,
-        onDismiss = { selectedStation = null },
-        onToggleFavorite = { stationNumber -> viewModel.toggleFavorite(stationNumber) }
-    )
+    // Station Details Bundle
+    selectedStation?.let { station ->
+        StationDetailsSheet(
+            station = station,
+            onDismiss = { selectedStation = null },
+            onToggleFavorite = { stationNumber -> viewModel.toggleFavorite(stationNumber) }
+        )
+    }
 }
