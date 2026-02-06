@@ -14,6 +14,18 @@ class Preferences(private val context: Context) {
         private const val SORT_FIELD_KEY = "sort_field"
         private const val SORT_ORDER_KEY = "sort_order"
         private const val FAVORITES_KEY = "favorite_stations"
+        private const val LAST_SCREEN_KEY = "last_screen"
+    }
+    
+    fun getLastScreen(): String {
+        return sharedPreferences.getString(LAST_SCREEN_KEY, "HOME") ?: "HOME"
+    }
+
+    fun setLastScreen(screenName: String) {
+        sharedPreferences.edit().apply {
+            putString(LAST_SCREEN_KEY, screenName)
+            apply()
+        }
     }
     
     fun getSortField(): SortField {

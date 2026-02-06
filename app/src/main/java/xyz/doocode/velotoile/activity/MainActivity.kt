@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.runtime.remember
 import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 
 class MainActivity : ComponentActivity() {
@@ -71,7 +72,16 @@ class MainActivity : ComponentActivity() {
 //@PreviewScreenSizes
 @Composable
 fun NavBarApp(viewModel: StationsViewModel) {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+    val initialScreenName = remember { viewModel.getLastScreen() }
+    val initialDestination = remember(initialScreenName) {
+        try {
+            AppDestinations.valueOf(initialScreenName)
+        } catch (e: Exception) {
+            AppDestinations.HOME
+        }
+    }
+    
+    var currentDestination by rememberSaveable { mutableStateOf(initialDestination) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -87,6 +97,7 @@ fun NavBarApp(viewModel: StationsViewModel) {
                     selected = it == currentDestination,
                     onClick = {
                         currentDestination = it
+                        viewModel.setLastScreen(it.name)
                     }
                 )
             }

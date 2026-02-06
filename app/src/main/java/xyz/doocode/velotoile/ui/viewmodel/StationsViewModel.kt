@@ -56,6 +56,14 @@ class StationsViewModel : ViewModel() {
         updateFavoriteStations()
     }
 
+    fun getLastScreen(): String {
+        return preferences?.getLastScreen() ?: "HOME"
+    }
+
+    fun setLastScreen(screenName: String) {
+        preferences?.setLastScreen(screenName)
+    }
+
     private fun loadPreferences() {
         preferences?.let { prefManager ->
             val field = prefManager.getSortField()
