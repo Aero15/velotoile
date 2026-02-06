@@ -5,6 +5,7 @@ import Resource
 import SortField
 import SortOrder
 import android.content.Context
+import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -36,6 +37,9 @@ class StationsViewModel : ViewModel() {
 
     private val _filteredStations = MutableLiveData<List<Station>>()
     val filteredStations: LiveData<List<Station>> = _filteredStations
+
+    private val _userLocation = MutableLiveData<Location?>()
+    val userLocation: LiveData<Location?> = _userLocation
 
     // New: favorite stations list (only the stations marked as favorite)
     private val _favoriteStations = MutableLiveData<List<Station>>(emptyList())
@@ -136,6 +140,13 @@ class StationsViewModel : ViewModel() {
         return newState
     }
 
+    fun updateUserLocation(location: Location) {
+        _userLocation.value = location
+        // re-trigger sort
+        val currentStations = (stations.value as? Resource.Success)?.data ?: emptyList()
+        applyFiltersAndSort(currentStations)
+    }
+
     private fun applyFiltersAndSort(stationsList: List<Station>) {
         val query = searchQuery.value?.trim()?.lowercase() ?: ""
         var filtered = stationsList
@@ -164,6 +175,16 @@ class StationsViewModel : ViewModel() {
             SortField.MECHANICAL_BIKES -> filtered.sortedBy { it.totalStands.availabilities.mechanicalBikes }
             SortField.ELECTRICAL_BIKES -> filtered.sortedBy { it.totalStands.availabilities.electricalBikes }
             SortField.AVAILABLE_STANDS -> filtered.sortedBy { it.totalStands.availabilities.stands }
+            SortField.PROXIMITY -> {
+                val loc = _userLocation.value
+                if (loc != null) {
+                    filtered.sortedBy { 
+                        val results = FloatArray(1)
+                        Location.distanceBetween(loc.latitude, loc.longitude, it.position.latitude, it.position.longitude, results)
+                        results[0]
+                    }
+                } else filtered
+            }
             else -> filtered
         }
 
@@ -185,6 +206,16 @@ class StationsViewModel : ViewModel() {
             SortField.MECHANICAL_BIKES -> filtered.sortedBy { it.totalStands.availabilities.mechanicalBikes }
             SortField.ELECTRICAL_BIKES -> filtered.sortedBy { it.totalStands.availabilities.electricalBikes }
             SortField.AVAILABLE_STANDS -> filtered.sortedBy { it.totalStands.availabilities.stands }
+            SortField.PROXIMITY -> {
+                val loc = _userLocation.value
+                if (loc != null) {
+                    filtered.sortedBy { 
+                        val results = FloatArray(1)
+                        Location.distanceBetween(loc.latitude, loc.longitude, it.position.latitude, it.position.longitude, results)
+                        results[0]
+                    }
+                } else filtered
+            }
             else -> filtered
         }
 

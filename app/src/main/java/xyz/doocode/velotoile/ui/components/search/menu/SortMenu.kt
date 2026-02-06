@@ -65,7 +65,8 @@ fun SortMenu(
                 Pair("Nombre de vélos", SortField.TOTAL_BIKES),
                 Pair("Vélos mécaniques", SortField.MECHANICAL_BIKES),
                 Pair("Vélos électriques", SortField.ELECTRICAL_BIKES),
-                Pair("Nombre de places", SortField.AVAILABLE_STANDS)
+                Pair("Nombre de places", SortField.AVAILABLE_STANDS),
+                Pair("Proximité", SortField.PROXIMITY)
             )
 
             sortOptions.forEach { (label, field) ->

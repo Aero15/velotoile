@@ -9,18 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -30,6 +22,17 @@ import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.core.dto.Station
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.LocationManager
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.core.content.ContextCompat
+import kotlinx.coroutines.launch
 import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,9 +44,48 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
     val searchQuery = viewModel.searchQuery.observeAsState("")
+    
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        if (!isSearching) {
+    // Function to get location and sort
+    fun refreshLocationAndSort() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        ) {
+             try {
+                val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) 
+                    ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                
+                lastKnownLocation?.let {
+                    viewModel.updateUserLocation(it)
+                    viewModel.setSortField(SortField.PROXIMITY)
+                    scope.launch { snackbarHostState.showSnackbar("Tri par proximité activé") }
+                } ?: run {
+                     scope.launch { snackbarHostState.showSnackbar("Impossible de récupérer la position") }
+                }
+            } catch (e: Exception) {
+                 e.printStackTrace()
+            }
+        }
+    }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true || 
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
+            refreshLocationAndSort()
+        } else {
+             scope.launch { snackbarHostState.showSnackbar("Permission de localisation nécessaire") }
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            if (!isSearching) {
             TopAppBar(
                 modifier = Modifier.padding(0.dp),
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -96,7 +138,8 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxSize(),
                     onStationClick = { station -> selectedStation = station },
                     sortField = currentSortField.value,
-                    isSearching = isSearching
+                    isSearching = isSearching,
+                    contentPadding = PaddingValues(bottom = 80.dp)
                 )
             }
             is Resource.Error<*> -> {
@@ -106,6 +149,32 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                 // État initial
             }
         }
+    }
+
+    FloatingActionButton(
+        onClick = {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            ) {
+                refreshLocationAndSort()
+            } else {
+                locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            }
+        },
+        modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .padding(bottom = 16.dp, end = 16.dp),
+        containerColor = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        Icon(Icons.Filled.MyLocation, contentDescription = "Localisation")
+    }
+
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(16.dp)
+    )
     }
 
     // Station details sheet
