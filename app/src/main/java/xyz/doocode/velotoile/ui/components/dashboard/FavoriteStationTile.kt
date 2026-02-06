@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -133,37 +134,16 @@ fun FavoriteStationTile(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Mechanical
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = Icons.Default.PedalBike,
-                                contentDescription = "Méca",
-                                tint = if (mechBikes > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = "$mechBikes",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = if (mechBikes > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error
-                            )
-                        }
-
-                        // Electrical
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = Icons.Filled.ElectricBike,
-                                contentDescription = "Élec",
-                                tint = if (elecBikes > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = "$elecBikes",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = if (elecBikes > 0) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error
-                            )
-                        }
+                        StationCounter(
+                            count = mechBikes,
+                            icon = Icons.Default.PedalBike,
+                            contentDescription = "Méca"
+                        )
+                        StationCounter(
+                            count = elecBikes,
+                            icon = Icons.Filled.ElectricBike,
+                            contentDescription = "Élec"
+                        )
                     }
 
                     // Divider
@@ -175,20 +155,11 @@ fun FavoriteStationTile(
                     )
 
                     // Stands
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Default.LocalParking,
-                            contentDescription = "Places",
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = "$stands",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                    StationCounter(
+                        count = stands,
+                        icon = Icons.Default.LocalParking,
+                        contentDescription = "Places"
+                    )
                 }
             }
 
@@ -233,4 +204,37 @@ fun FavoriteStationTile(
 fun formatStationName(originalName: String): String {
     // Regex to remove leading numbers indicating station ID like "123 - "
     return originalName.replace(Regex("^\\d+\\s*-\\s*"), "")
+}
+
+@Composable
+private fun StationCounter(
+    count: Int,
+    icon: ImageVector,
+    contentDescription: String,
+) {
+    val iconColor = when (count) {
+        0 -> Color(0xFFD32F2F)
+        in 1..2 -> Color(0xFFFF9800)
+        else -> MaterialTheme.colorScheme.primary
+    }
+    val textColor = when (count) {
+        0 -> Color(0xFFD32F2F)
+        in 1..2 -> Color(0xFFFF9800)
+        else -> MaterialTheme.colorScheme.onSurface
+    }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            tint = iconColor,
+            modifier = Modifier.size(24.dp)
+        )
+        Text(
+            text = "$count",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = textColor
+        )
+    }
 }

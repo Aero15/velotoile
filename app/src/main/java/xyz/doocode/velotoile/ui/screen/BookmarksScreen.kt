@@ -80,9 +80,9 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
         // App Bar
         if (!isSearching) {
             TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
+                /*colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = VelotoileTheme.colors.topBarBackground,
-                ),
+                ),*/
                 title = { Text("Favorites") },
                 windowInsets = WindowInsets(top = 0.dp),
                 actions = {
@@ -134,7 +134,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
