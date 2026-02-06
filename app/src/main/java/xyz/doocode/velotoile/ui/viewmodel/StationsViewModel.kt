@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ class StationsViewModel : ViewModel() {
 
     private val REFRESH_INTERVAL = 120_000L // 120 seconds
     private var preferences: Preferences? = null
+    private var refreshJob: Job? = null
 
     fun initializePreferences(context: Context) {
         preferences = Preferences(context)
@@ -77,12 +79,18 @@ class StationsViewModel : ViewModel() {
     }
 
     fun startAutoRefresh() {
-        viewModelScope.launch {
+        if (refreshJob?.isActive == true) return
+        refreshJob = viewModelScope.launch {
             while (isActive) {
                 delay(REFRESH_INTERVAL)
                 loadStations()
             }
         }
+    }
+
+    fun stopAutoRefresh() {
+        refreshJob?.cancel()
+        refreshJob = null
     }
 
     fun setSearchQuery(query: String) {

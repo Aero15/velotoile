@@ -48,14 +48,23 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         viewModel.initializePreferences(this)
-        viewModel.loadStations()
-        viewModel.startAutoRefresh()
 
         setContent {
             VelotoileTheme {
                 NavBarApp(viewModel)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.loadStations()
+        viewModel.startAutoRefresh()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.stopAutoRefresh()
     }
 }
 
