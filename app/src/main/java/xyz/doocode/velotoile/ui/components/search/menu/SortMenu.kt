@@ -1,13 +1,22 @@
 package xyz.doocode.velotoile.ui.components.search.menu
 
+import SortField
+import StationsViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.ElectricBike
+import androidx.compose.material.icons.filled.LocalParking
+import androidx.compose.material.icons.filled.PedalBike
+import androidx.compose.material.icons.filled.Pin
+import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.*
 import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 
@@ -60,22 +69,30 @@ fun SortMenu(
             )
 
             val sortOptions = listOf(
-                Pair("Nom", SortField.NAME),
-                Pair("Numéro", SortField.NUMBER),
-                Pair("Nombre de vélos", SortField.TOTAL_BIKES),
-                Pair("Vélos mécaniques", SortField.MECHANICAL_BIKES),
-                Pair("Vélos électriques", SortField.ELECTRICAL_BIKES),
-                Pair("Nombre de places", SortField.AVAILABLE_STANDS),
-                Pair("Proximité", SortField.PROXIMITY)
+                SortOption("Nom", SortField.NAME, Icons.Default.TextFields),
+                SortOption("Numéro", SortField.NUMBER, Icons.Default.Tag),
+                SortOption("Nombre de vélos", SortField.TOTAL_BIKES, Icons.Default.Pin),
+                SortOption("Vélos mécaniques", SortField.MECHANICAL_BIKES, Icons.Filled.PedalBike),
+                SortOption("Vélos électriques", SortField.ELECTRICAL_BIKES, Icons.Filled.ElectricBike),
+                SortOption("Nombre de places", SortField.AVAILABLE_STANDS, Icons.Filled.LocalParking)
             )
 
-            sortOptions.forEach { (label, field) ->
-                SortFieldMenuItem(
-                    label = label,
-                    isSelected = currentSortField.value == field,
-                    onClick = { viewModel.setSortField(field) }
+            sortOptions.forEach { option ->
+                SortOrderMenuItem(
+                    label = option.label,
+                    icon = option.icon,
+                    isSelected = currentSortField.value == option.field,
+                    onClick = { viewModel.setSortField(option.field) }
                 )
             }
+
         }
     }
 }
+
+data class SortOption(
+    val label: String,
+    val field: SortField,
+    val icon: ImageVector
+)
+
