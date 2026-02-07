@@ -6,12 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.PedalBike
-import androidx.compose.material.icons.filled.ElectricBike
-import androidx.compose.material.icons.filled.LocalParking
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,24 +16,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import xyz.doocode.velotoile.core.dto.Station
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FavoriteStationTile(
     station: Station,
+    isLarge: Boolean = false,
     onClick: () -> Unit,
     onUnfavorite: () -> Unit,
+    onToggleSize: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -47,16 +42,11 @@ fun FavoriteStationTile(
 
     // Determine colors/status
     val isOpen = station.status == "OPEN"
-    val bikes = station.mainStands.availabilities.bikes
-    val mechBikes = station.mainStands.availabilities.mechanicalBikes
-    val elecBikes = station.mainStands.availabilities.electricalBikes
-    val stands = station.mainStands.availabilities.stands
-    
     val backgroundColor = when {
-        !isOpen -> Color(0xFF616161) // Grey for closed
-        bikes == 0 -> Color(0xFFD32F2F) // Red for empty
-        bikes < 3 -> Color(0xFFF57C00) // Orange for low
-        else -> Color(0xFF388E3C) // Green for good
+        !isOpen -> Color(0xFF616161)
+        station.mainStands.availabilities.bikes == 0 -> Color(0xFFD32F2F)
+        station.mainStands.availabilities.bikes < 3 -> Color(0xFFF57C00)
+        else -> Color(0xFF388E3C)
     }
     
     val surfaceColor = MaterialTheme.colorScheme.surfaceContainer
@@ -66,7 +56,7 @@ fun FavoriteStationTile(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(160.dp) // Fixed height for tile look
+            .height(160.dp)
             .clip(RoundedCornerShape(12.dp))
             .combinedClickable(
                 onClick = onClick,
@@ -87,8 +77,7 @@ fun FavoriteStationTile(
                     )
                 )
         ) {
-            
-            // Status bar at top or background hint
+            // Status bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,81 +86,10 @@ fun FavoriteStationTile(
                     .align(Alignment.TopCenter)
             )
 
-            Column(
-                modifier = Modifier
-                    .padding(12.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Header: Name and Status
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Text(
-                        text = formatStationName(station.name),
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    if (!isOpen) {
-                        Surface(
-                            color = Color.Red,
-                            shape = RoundedCornerShape(4.dp),
-                            modifier = Modifier.padding(start = 4.dp)
-                        ) {
-                            Text(
-                                text = "FERMÉ",
-                                color = Color.White,
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
-                }
-
-                // Center: Big Data
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Bikes Group
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        StationCounter(
-                            count = mechBikes,
-                            icon = Icons.Default.PedalBike,
-                            contentDescription = "Méca"
-                        )
-                        StationCounter(
-                            count = elecBikes,
-                            icon = Icons.Filled.ElectricBike,
-                            contentDescription = "Élec"
-                        )
-                    }
-
-                    // Divider
-                    Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(40.dp)
-                            .background(MaterialTheme.colorScheme.outlineVariant)
-                    )
-
-                    // Stands
-                    StationCounter(
-                        count = stands,
-                        icon = Icons.Default.LocalParking,
-                        contentDescription = "Places"
-                    )
-                }
+            if (isLarge) {
+                LargeStationContent(station, isOpen)
+            } else {
+                StandardStationContent(station, isOpen)
             }
 
             // Context Menu
@@ -182,11 +100,13 @@ fun FavoriteStationTile(
             ) {
                 DropdownMenuItem(
                     text = { Text("Voir détails") },
-                    onClick = {
-                        showMenu = false
-                        onClick()
-                    },
+                    onClick = { showMenu = false; onClick() },
                     leadingIcon = { Icon(Icons.Default.Info, contentDescription = null) }
+                )
+                DropdownMenuItem(
+                    text = { Text(if (isLarge) "Taille normale" else "Grande taille") },
+                    onClick = { showMenu = false; onToggleSize() },
+                    leadingIcon = { Icon(if (isLarge) Icons.Default.CloseFullscreen else Icons.Default.OpenInFull, contentDescription = null) }
                 )
                 DropdownMenuItem(
                     text = { Text("Copier l'adresse") },
@@ -199,10 +119,7 @@ fun FavoriteStationTile(
                 HorizontalDivider()
                 DropdownMenuItem(
                     text = { Text("Retirer des favoris") },
-                    onClick = {
-                        showMenu = false
-                        onUnfavorite()
-                    },
+                    onClick = { showMenu = false; onUnfavorite() },
                     leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) },
                     colors = MenuDefaults.itemColors(textColor = MaterialTheme.colorScheme.error)
                 )
@@ -211,17 +128,156 @@ fun FavoriteStationTile(
     }
 }
 
-// Helper to clean station name (often has "NUMBER - NAME")
-fun formatStationName(originalName: String): String {
-    // Regex to remove leading numbers indicating station ID like "123 - "
-    return originalName.replace(Regex("^\\d+\\s*-\\s*"), "")
+@Composable
+fun StandardStationContent(station: Station, isOpen: Boolean) {
+    StationMainContent(
+        station = station,
+        isOpen = isOpen,
+        isLarge = false,
+        modifier = Modifier.padding(12.dp)
+    )
+}
+
+@Composable
+fun LargeStationContent(station: Station, isOpen: Boolean) {
+    Row(modifier = Modifier.fillMaxSize()) {
+        // LEFT COLUMN: Main Stats (Reusing common component)
+        StationMainContent(
+            station = station,
+            isOpen = isOpen,
+            isLarge = true,
+            modifier = Modifier
+                .weight(1f)
+                .padding(12.dp)
+        )
+
+        // Vertical Divider
+        Box(
+            modifier = Modifier
+                .width(1.dp)
+                .fillMaxHeight()
+                .padding(vertical = 12.dp)
+                .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+        )
+
+        // RIGHT COLUMN: Extra Info
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(12.dp)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            
+            // Header: Station Number & Status
+            Row(
+                modifier = Modifier.fillMaxWidth(), 
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Top
+            ) {
+                if (!isOpen) { 
+                    ClosedBadge() 
+                } else {
+                   Text(
+                       text = "#${station.number}",
+                       style = MaterialTheme.typography.headlineLarge,
+                       fontWeight = FontWeight.Black
+                   )
+                }
+            }
+
+            // Info Grid / List
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (station.bonus) InfoRow(Icons.Default.Star, "Bonus", Color(0xFFFFD700)) // Gold
+                if (station.banking) InfoRow(Icons.Default.CreditCard, "TPE", MaterialTheme.colorScheme.onSurface)
+                if (station.overflow) InfoRow(Icons.Default.Warning, "Overflow", Color(0xFFFF9800))
+                if (station.connected) InfoRow(Icons.Default.Wifi, "Connecté", MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
+}
+
+@Composable
+fun StationMainContent(
+    station: Station,
+    isOpen: Boolean,
+    isLarge: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val mechBikes = station.mainStands.availabilities.mechanicalBikes
+    val elecBikes = station.mainStands.availabilities.electricalBikes
+    val stands = station.mainStands.availabilities.stands
+
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Text(
+                text = formatStationName(station.name),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            // In standard mode, we show the badge next to the title.
+            // In large mode, the badge is moved to the right column.
+            if (!isLarge && !isOpen) {
+                ClosedBadge()
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            StationCounter(mechBikes, Icons.Default.PedalBike, "Méca", isLarge)
+            StationCounter(elecBikes, Icons.Filled.ElectricBike, "Élec", isLarge)
+            StationCounter(stands, Icons.Default.LocalParking, "Places", isLarge)
+        }
+    }
+}
+
+@Composable
+fun InfoRow(icon: ImageVector, text: String, tint: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End) {
+        Text(text, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, color = tint)
+        Spacer(modifier = Modifier.width(8.dp))
+        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
+    }
+}
+
+@Composable
+fun ClosedBadge() {
+    Surface(
+        color = MaterialTheme.colorScheme.error,
+        shape = RoundedCornerShape(4.dp)
+    ) {
+        Text(
+            text = "FERMÉ",
+            color = MaterialTheme.colorScheme.onError,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+        )
+    }
 }
 
 @Composable
 private fun StationCounter(
-    count: Int,
-    icon: ImageVector,
-    contentDescription: String,
+    count: Int, 
+    icon: ImageVector, 
+    label: String? = null, 
+    isLarge: Boolean = false
 ) {
     val iconColor = when (count) {
         0 -> Color(0xFFD32F2F)
@@ -236,16 +292,28 @@ private fun StationCounter(
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            imageVector = icon,
-            contentDescription = contentDescription,
-            tint = iconColor,
-            modifier = Modifier.size(24.dp)
+            icon, 
+            contentDescription = null, 
+            tint = iconColor, 
+            modifier = Modifier.size(if (isLarge) 20.dp else 24.dp)
         )
         Text(
-            text = "$count",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
+            "$count", 
+            style = if (isLarge) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineSmall, 
+            fontWeight = FontWeight.Bold, 
             color = textColor
         )
+        if (isLarge && label != null) {
+            Text(
+                label, 
+                style = MaterialTheme.typography.labelSmall, 
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
+}
+
+// Helper
+fun formatStationName(originalName: String): String {
+    return originalName.replace(Regex("^\\d+\\s*-\\s*"), "")
 }

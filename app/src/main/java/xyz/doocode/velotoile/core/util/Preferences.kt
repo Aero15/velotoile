@@ -14,6 +14,7 @@ class Preferences(private val context: Context) {
         private const val SORT_FIELD_KEY = "sort_field"
         private const val SORT_ORDER_KEY = "sort_order"
         private const val FAVORITES_KEY = "favorite_stations"
+        private const val LARGE_TILES_KEY = "large_tiles_stations"
         private const val LAST_SCREEN_KEY = "last_screen"
     }
     
@@ -107,6 +108,37 @@ class Preferences(private val context: Context) {
         val favoriteString = favorites.joinToString(",")
         sharedPreferences.edit().apply {
             putString(FAVORITES_KEY, favoriteString)
+            apply()
+        }
+    }
+
+    // Large Tiles Management
+    fun getLargeTileStations(): Set<Int> {
+        val largeString = sharedPreferences.getString(LARGE_TILES_KEY, "")
+        return if (largeString.isNullOrEmpty()) {
+            emptySet()
+        } else {
+            largeString.split(",").mapNotNull { it.toIntOrNull() }.toSet()
+        }
+    }
+
+    fun isLargeTile(stationNumber: Int): Boolean {
+        return getLargeTileStations().contains(stationNumber)
+    }
+
+    fun setTileSize(stationNumber: Int, isLarge: Boolean) {
+        val largeTiles = getLargeTileStations().toMutableSet()
+        if (isLarge) {
+            largeTiles.add(stationNumber)
+        } else {
+            largeTiles.remove(stationNumber)
+        }
+        saveLargeTiles(largeTiles)
+    }
+
+    private fun saveLargeTiles(largeTiles: Set<Int>) {
+        sharedPreferences.edit().apply {
+            putString(LARGE_TILES_KEY, largeTiles.joinToString(","))
             apply()
         }
     }

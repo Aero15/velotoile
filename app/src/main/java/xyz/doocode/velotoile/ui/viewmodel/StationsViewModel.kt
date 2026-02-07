@@ -49,6 +49,10 @@ class StationsViewModel : ViewModel() {
     private val _favoriteNumbers = MutableLiveData<Set<Int>>(emptySet())
     val favoriteNumbers: LiveData<Set<Int>> = _favoriteNumbers
 
+    // Large tiles support
+    private val _largeTileStations = MutableLiveData<Set<Int>>(emptySet())
+    val largeTileStations: LiveData<Set<Int>> = _largeTileStations
+
     private val REFRESH_INTERVAL = 120_000L // 120 seconds
     private var preferences: Preferences? = null
     private var refreshJob: Job? = null
@@ -58,6 +62,17 @@ class StationsViewModel : ViewModel() {
         loadPreferences()
         // Initialize favorites view
         updateFavoriteStations()
+        loadLargeTiles()
+    }
+
+    private fun loadLargeTiles() {
+        _largeTileStations.value = preferences?.getLargeTileStations() ?: emptySet()
+    }
+
+    fun toggleStationSize(stationNumber: Int) {
+        val current = preferences?.isLargeTile(stationNumber) ?: false
+        preferences?.setTileSize(stationNumber, !current)
+        loadLargeTiles()
     }
 
     fun getLastScreen(): String {

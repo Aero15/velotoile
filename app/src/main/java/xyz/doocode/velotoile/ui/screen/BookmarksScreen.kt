@@ -3,6 +3,7 @@ package xyz.doocode.velotoile.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
@@ -26,7 +27,6 @@ import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
 import xyz.doocode.velotoile.ui.components.common.LocationFab
 import xyz.doocode.velotoile.ui.components.common.RateLimitedPullToRefresh
 import xyz.doocode.velotoile.ui.components.common.RefreshSuccessObserver
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +37,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
     var bookmarkSearchQuery by rememberSaveable { mutableStateOf("") }
 
     val favoriteStations = viewModel.favoriteStations.observeAsState(emptyList())
+    val largeTileStations = viewModel.largeTileStations.observeAsState(emptySet())
     val stationsResource = viewModel.stations.observeAsState()
     
     // Refresh state
@@ -143,12 +144,18 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                 ) {
                     items(
                         items = displayedFavorites,
-                        key = { it.number }
+                        key = { it.number },
+                        span = { station ->
+                            val isLarge = largeTileStations.value.contains(station.number)
+                            GridItemSpan(if (isLarge) 2 else 1)
+                        }
                     ) { station ->
                         FavoriteStationTile(
                             station = station,
+                            isLarge = largeTileStations.value.contains(station.number),
                             onClick = { selectedStation = station },
-                            onUnfavorite = { viewModel.toggleFavorite(station.number) }
+                            onUnfavorite = { viewModel.toggleFavorite(station.number) },
+                            onToggleSize = { viewModel.toggleStationSize(station.number) }
                         )
                     }
                 }
