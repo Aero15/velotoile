@@ -157,7 +157,8 @@ private fun InfoRow(
         )
 
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

@@ -71,12 +71,21 @@ fun SortMenu(
             val sortOptions = listOf(
                 SortOption("Nom", SortField.NAME, Icons.Default.TextFields),
                 SortOption("Numéro", SortField.NUMBER, Icons.Default.Tag),
-                SortOption("Vélos disponibles", SortField.TOTAL_BIKES,
+                SortOption(
+                    "Vélos disponibles", SortField.TOTAL_BIKES,
                     Icons.AutoMirrored.Filled.DirectionsBike
                 ),
                 SortOption("Vélos mécaniques", SortField.MECHANICAL_BIKES, Icons.Filled.PedalBike),
-                SortOption("Vélos électriques", SortField.ELECTRICAL_BIKES, Icons.Filled.ElectricBike),
-                SortOption("Nombre de places", SortField.AVAILABLE_STANDS, Icons.Filled.LocalParking),
+                SortOption(
+                    "Vélos électriques",
+                    SortField.ELECTRICAL_BIKES,
+                    Icons.Filled.ElectricBike
+                ),
+                SortOption(
+                    "Nombre de places",
+                    SortField.AVAILABLE_STANDS,
+                    Icons.Filled.LocalParking
+                ),
                 SortOption("Proximité", SortField.PROXIMITY, Icons.Default.NearMe)
             )
 

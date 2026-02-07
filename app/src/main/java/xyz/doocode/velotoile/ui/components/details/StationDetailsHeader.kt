@@ -32,7 +32,7 @@ fun StationDetailsHeader(
     val context = LocalContext.current
     val preferences = remember { Preferences(context) }
     val isFavorite = remember { mutableStateOf(preferences.isFavorite(station.number)) }
-    
+
     val hasWarning = station.status == "CLOSED" || station.overflow || !station.connected;
     Column(
         modifier = Modifier

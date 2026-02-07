@@ -13,21 +13,21 @@ object ApiClient {
     private const val BASE_URL = "https://api.jcdecaux.com/"
     const val API_KEY = BuildConfig.ApiKey_JCDecaux
     const val CONTRACT_NAME = "besancon"
-    
+
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
-    
+
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
-    
+
     private val gson = GsonBuilder()
         .registerTypeAdapter(Long::class.java, DateDeserializer)
         .create()
-    
+
     val jcDecauxApi: JCDecauxApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)

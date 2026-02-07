@@ -4,7 +4,7 @@ import java.io.IOException
 
 class BikeRepository {
     private val api = ApiClient.jcDecauxApi
-    
+
     suspend fun getStations(): Resource<List<Station>> {
         return try {
             val response = api.getStations(
@@ -20,7 +20,7 @@ class BikeRepository {
             Resource.Error("Erreur inattendue: ${e.localizedMessage}")
         }
     }
-    
+
     suspend fun getStation(stationNumber: Int): Resource<Station> {
         return try {
             val response = api.getStation(

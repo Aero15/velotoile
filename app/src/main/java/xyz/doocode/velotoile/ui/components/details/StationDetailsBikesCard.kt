@@ -3,7 +3,6 @@ package xyz.doocode.velotoile.ui.components.details
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.Eject
@@ -89,7 +88,8 @@ private fun BikeInfoRow(
             .padding(vertical = 8.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(start = if (indent) 28.dp else 0.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -133,7 +133,7 @@ private fun BikeInfoRow(
 )
 @Composable
 private fun BikeInfoRowPreview() {
-    VelotoileTheme{
+    VelotoileTheme {
         BikeInfoRow(
             label = "Mécaniques",
             value = 10,

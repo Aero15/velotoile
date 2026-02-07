@@ -2,7 +2,7 @@ package xyz.doocode.velotoile.core.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class Station (
+data class Station(
     val number: Int,
     val name: String,
     val address: String,
@@ -18,17 +18,17 @@ data class Station (
     val mainStands: Stands
 )
 
-data class Position (
+data class Position(
     val latitude: Double,
     val longitude: Double
 )
 
-data class Stands (
+data class Stands(
     val availabilities: Availabilities,
     val capacity: Int
 )
 
-data class Availabilities (
+data class Availabilities(
     val bikes: Int,
     val stands: Int,
     val mechanicalBikes: Int,

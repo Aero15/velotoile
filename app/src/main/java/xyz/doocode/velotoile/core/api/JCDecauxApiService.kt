@@ -9,7 +9,7 @@ interface JCDecauxApiService {
         @Query("contract") contract: String,
         @Query("apiKey") apiKey: String
     ): List<Station>
-    
+
     @GET("vls/v3/stations/{station_number}")
     suspend fun getStation(
         @Path("station_number") stationNumber: Int,

@@ -6,9 +6,9 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class Preferences(private val context: Context) {
-    private val sharedPreferences: SharedPreferences = 
+    private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    
+
     companion object {
         private const val PREFS_NAME = "velotoile_prefs"
         private const val SORT_FIELD_KEY = "sort_field"
@@ -17,7 +17,7 @@ class Preferences(private val context: Context) {
         private const val LARGE_TILES_KEY = "large_tiles_stations"
         private const val LAST_SCREEN_KEY = "last_screen"
     }
-    
+
     fun getLastScreen(): String {
         return sharedPreferences.getString(LAST_SCREEN_KEY, "HOME") ?: "HOME"
     }
@@ -28,7 +28,7 @@ class Preferences(private val context: Context) {
             apply()
         }
     }
-    
+
     fun getSortField(): SortField {
         val savedValue = sharedPreferences.getString(SORT_FIELD_KEY, SortField.NUMBER.name)
         return try {
@@ -37,14 +37,14 @@ class Preferences(private val context: Context) {
             SortField.NUMBER
         }
     }
-    
+
     fun setSortField(field: SortField) {
         sharedPreferences.edit().apply {
             putString(SORT_FIELD_KEY, field.name)
             apply()
         }
     }
-    
+
     fun getSortOrder(): SortOrder {
         val savedValue = sharedPreferences.getString(SORT_ORDER_KEY, SortOrder.ASCENDING.name)
         return try {
@@ -53,14 +53,14 @@ class Preferences(private val context: Context) {
             SortOrder.ASCENDING
         }
     }
-    
+
     fun setSortOrder(order: SortOrder) {
         sharedPreferences.edit().apply {
             putString(SORT_ORDER_KEY, order.name)
             apply()
         }
     }
-    
+
     fun saveSortPreferences(field: SortField, order: SortOrder) {
         sharedPreferences.edit().apply {
             putString(SORT_FIELD_KEY, field.name)
@@ -68,7 +68,7 @@ class Preferences(private val context: Context) {
             apply()
         }
     }
-    
+
     fun getFavoriteStations(): Set<Int> {
         val favoriteString = sharedPreferences.getString(FAVORITES_KEY, "")
         return if (favoriteString.isNullOrEmpty()) {
@@ -77,23 +77,23 @@ class Preferences(private val context: Context) {
             favoriteString.split(",").mapNotNull { it.toIntOrNull() }.toSet()
         }
     }
-    
+
     fun isFavorite(stationNumber: Int): Boolean {
         return getFavoriteStations().contains(stationNumber)
     }
-    
+
     fun addFavorite(stationNumber: Int) {
         val favorites = getFavoriteStations().toMutableSet()
         favorites.add(stationNumber)
         saveFavorites(favorites)
     }
-    
+
     fun removeFavorite(stationNumber: Int) {
         val favorites = getFavoriteStations().toMutableSet()
         favorites.remove(stationNumber)
         saveFavorites(favorites)
     }
-    
+
     fun toggleFavorite(stationNumber: Int): Boolean {
         return if (isFavorite(stationNumber)) {
             removeFavorite(stationNumber)
@@ -103,7 +103,7 @@ class Preferences(private val context: Context) {
             true
         }
     }
-    
+
     private fun saveFavorites(favorites: Set<Int>) {
         val favoriteString = favorites.joinToString(",")
         sharedPreferences.edit().apply {
