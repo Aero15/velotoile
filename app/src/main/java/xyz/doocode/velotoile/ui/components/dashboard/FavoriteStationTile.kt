@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
+import SortField
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,7 +35,8 @@ fun FavoriteStationTile(
     onClick: () -> Unit,
     onUnfavorite: () -> Unit,
     onToggleSize: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sortField: SortField = SortField.NUMBER
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
@@ -42,17 +44,25 @@ fun FavoriteStationTile(
 
     // Determine colors/status
     val isOpen = station.status == "OPEN"
+
+    val targetValue = when (sortField) {
+        SortField.AVAILABLE_STANDS -> station.mainStands.availabilities.stands
+        SortField.MECHANICAL_BIKES -> station.mainStands.availabilities.mechanicalBikes
+        SortField.ELECTRICAL_BIKES -> station.mainStands.availabilities.electricalBikes
+        else -> station.mainStands.availabilities.bikes
+    }
+
     val backgroundColor = when {
         !isOpen -> Color(0xFF616161)
-        station.mainStands.availabilities.bikes == 0 -> Color(0xFFD32F2F)
-        station.mainStands.availabilities.bikes < 3 -> Color(0xFFF57C00)
+        targetValue == 0 -> Color(0xFFD32F2F)
+        targetValue < 3 -> Color(0xFFF57C00)
         else -> Color(0xFF388E3C)
     }
-    
+
     val surfaceColor = MaterialTheme.colorScheme.surfaceContainer
     val topColor = backgroundColor.copy(alpha = 0.4f).compositeOver(surfaceColor)
     val bottomColor = backgroundColor.copy(alpha = 0.1f).compositeOver(surfaceColor)
-    
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -87,9 +97,9 @@ fun FavoriteStationTile(
             )
 
             if (isLarge) {
-                LargeStationContent(station, isOpen)
+                LargeStationContent(station, isOpen, sortField)
             } else {
-                StandardStationContent(station, isOpen)
+                StandardStationContent(station, isOpen, sortField)
             }
 
             // Context Menu
@@ -106,7 +116,12 @@ fun FavoriteStationTile(
                 DropdownMenuItem(
                     text = { Text(if (isLarge) "Taille normale" else "Grande taille") },
                     onClick = { showMenu = false; onToggleSize() },
-                    leadingIcon = { Icon(if (isLarge) Icons.Default.CloseFullscreen else Icons.Default.OpenInFull, contentDescription = null) }
+                    leadingIcon = {
+                        Icon(
+                            if (isLarge) Icons.Default.CloseFullscreen else Icons.Default.OpenInFull,
+                            contentDescription = null
+                        )
+                    }
                 )
                 DropdownMenuItem(
                     text = { Text("Copier l'adresse") },
@@ -129,23 +144,25 @@ fun FavoriteStationTile(
 }
 
 @Composable
-fun StandardStationContent(station: Station, isOpen: Boolean) {
+fun StandardStationContent(station: Station, isOpen: Boolean, sortField: SortField) {
     StationMainContent(
         station = station,
         isOpen = isOpen,
         isLarge = false,
+        sortField = sortField,
         modifier = Modifier.padding(12.dp)
     )
 }
 
 @Composable
-fun LargeStationContent(station: Station, isOpen: Boolean) {
+fun LargeStationContent(station: Station, isOpen: Boolean, sortField: SortField) {
     Row(modifier = Modifier.fillMaxSize()) {
         // LEFT COLUMN: Main Stats (Reusing common component)
         StationMainContent(
             station = station,
             isOpen = isOpen,
             isLarge = true,
+            sortField = sortField,
             modifier = Modifier
                 .weight(1f)
                 .padding(12.dp)
@@ -168,21 +185,21 @@ fun LargeStationContent(station: Station, isOpen: Boolean) {
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            
+
             // Header: Station Number & Status
             Row(
-                modifier = Modifier.fillMaxWidth(), 
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.Top
             ) {
-                if (!isOpen) { 
-                    ClosedBadge() 
+                if (!isOpen) {
+                    ClosedBadge()
                 } else {
-                   Text(
-                       text = "#${station.number}",
-                       style = MaterialTheme.typography.headlineLarge,
-                       fontWeight = FontWeight.Black
-                   )
+                    Text(
+                        text = "#${station.number}",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Black
+                    )
                 }
             }
 
@@ -193,9 +210,17 @@ fun LargeStationContent(station: Station, isOpen: Boolean) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (station.bonus) InfoRow(Icons.Default.Star, "Bonus", Color(0xFFFFD700)) // Gold
-                if (station.banking) InfoRow(Icons.Default.CreditCard, "TPE", MaterialTheme.colorScheme.onSurface)
+                if (station.banking) InfoRow(
+                    Icons.Default.CreditCard,
+                    "TPE",
+                    MaterialTheme.colorScheme.onSurface
+                )
                 if (station.overflow) InfoRow(Icons.Default.Warning, "Overflow", Color(0xFFFF9800))
-                if (station.connected) InfoRow(Icons.Default.Wifi, "Connecté", MaterialTheme.colorScheme.primary)
+                if (station.connected) InfoRow(
+                    Icons.Default.Wifi,
+                    "Connecté",
+                    MaterialTheme.colorScheme.primary
+                )
             }
         }
     }
@@ -206,11 +231,16 @@ fun StationMainContent(
     station: Station,
     isOpen: Boolean,
     isLarge: Boolean,
+    sortField: SortField,
     modifier: Modifier = Modifier
 ) {
     val mechBikes = station.mainStands.availabilities.mechanicalBikes
     val elecBikes = station.mainStands.availabilities.electricalBikes
     val stands = station.mainStands.availabilities.stands
+
+    val isMechBold = sortField == SortField.MECHANICAL_BIKES || sortField == SortField.TOTAL_BIKES
+    val isElecBold = sortField == SortField.ELECTRICAL_BIKES || sortField == SortField.TOTAL_BIKES
+    val isStandsBold = sortField == SortField.AVAILABLE_STANDS
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -241,9 +271,21 @@ fun StationMainContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            StationCounter(mechBikes, Icons.Default.PedalBike, "Méca", isLarge)
-            StationCounter(elecBikes, Icons.Filled.ElectricBike, "Élec", isLarge)
-            StationCounter(stands, Icons.Default.LocalParking, "Places", isLarge)
+            StationCounter(mechBikes, Icons.Default.PedalBike, "Méca", isLarge, isBold = isMechBold)
+            StationCounter(
+                elecBikes,
+                Icons.Filled.ElectricBike,
+                "Élec",
+                isLarge,
+                isBold = isElecBold
+            )
+            StationCounter(
+                stands,
+                Icons.Default.LocalParking,
+                "Places",
+                isLarge,
+                isBold = isStandsBold
+            )
         }
     }
 }
@@ -251,7 +293,12 @@ fun StationMainContent(
 @Composable
 fun InfoRow(icon: ImageVector, text: String, tint: Color) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.End) {
-        Text(text, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Medium, color = tint)
+        Text(
+            text,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
+            color = tint
+        )
         Spacer(modifier = Modifier.width(8.dp))
         Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(16.dp))
     }
@@ -274,10 +321,11 @@ fun ClosedBadge() {
 
 @Composable
 private fun StationCounter(
-    count: Int, 
-    icon: ImageVector, 
-    label: String? = null, 
-    isLarge: Boolean = false
+    count: Int,
+    icon: ImageVector,
+    label: String? = null,
+    isLarge: Boolean = false,
+    isBold: Boolean = false
 ) {
     val iconColor = when (count) {
         0 -> Color(0xFFD32F2F)
@@ -292,22 +340,23 @@ private fun StationCounter(
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
-            icon, 
-            contentDescription = null, 
-            tint = iconColor, 
-            modifier = Modifier.size(if (isLarge) 20.dp else 24.dp)
+            icon,
+            contentDescription = null,
+            tint = iconColor,
+            modifier = Modifier.size(24.dp)
         )
         Text(
-            "$count", 
-            style = if (isLarge) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineSmall, 
-            fontWeight = FontWeight.Bold, 
+            "$count",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = if (isBold) FontWeight.Black else FontWeight.Normal,
             color = textColor
         )
         if (isLarge && label != null) {
             Text(
-                label, 
-                style = MaterialTheme.typography.labelSmall, 
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
             )
         }
     }

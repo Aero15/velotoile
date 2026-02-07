@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import xyz.doocode.velotoile.core.dto.Station
+import SortField
 import xyz.doocode.velotoile.ui.components.dashboard.FavoriteStationTile
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
 import xyz.doocode.velotoile.ui.components.search.SearchBar
@@ -43,7 +44,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
     val sortField = viewModel.sortField.observeAsState()
     val sortOrder = viewModel.sortOrder.observeAsState()
     val userLocation = viewModel.userLocation.observeAsState()
-    
+
     val gridState = rememberLazyGridState()
 
     LaunchedEffect(sortField.value, sortOrder.value, userLocation.value) {
@@ -51,7 +52,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
     }
     // Refresh state
     val isRefreshing = stationsResource.value is Resource.Loading
-    
+
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Success Observer
@@ -75,118 +76,124 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
-        // App Bar
-        if (!isSearching) {
-            TopAppBar(
-                title = { Text("Favorites") },
-                windowInsets = WindowInsets(top = 0.dp),
-                actions = {
-                    IconButton(onClick = { showSortMenu = !showSortMenu }) {
-                        Icon(Icons.Filled.SortByAlpha, contentDescription = "Tri")
-                    }
+            // App Bar
+            if (!isSearching) {
+                TopAppBar(
+                    title = { Text("Favorites") },
+                    windowInsets = WindowInsets(top = 0.dp),
+                    actions = {
+                        IconButton(onClick = { showSortMenu = !showSortMenu }) {
+                            Icon(Icons.Filled.SortByAlpha, contentDescription = "Tri")
+                        }
 
-                    SortMenu(
-                        isMenuOpen = showSortMenu,
-                        onMenuOpenChange = { showSortMenu = it },
-                        viewModel = viewModel,
-                        modifier = Modifier.padding(top = 32.dp)
-                    )
-
-                    IconButton(onClick = { isSearching = !isSearching }) {
-                        Icon(Icons.Filled.Search, contentDescription = "Recherche")
-                    }
-                }
-            )
-        } else {
-            SearchBar(
-                transparent = true,
-                searchQuery = bookmarkSearchQuery,
-                onSearchQueryChanged = { bookmarkSearchQuery = it },
-                onCloseSearch = { isSearching = false; bookmarkSearchQuery = "" },
-                modifier = Modifier.background(Color(0xFF00999d))
-            )
-        }
-
-        // Main Content with RateLimitedPullToRefresh
-        RateLimitedPullToRefresh(
-            isRefreshing = isRefreshing,
-            onRefresh = { viewModel.loadStations() },
-            snackbarHostState = snackbarHostState,
-            modifier = Modifier.weight(1f)
-        ) {
-            if (displayedFavorites.isEmpty()) {
-                // Empty State
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = if (bookmarkSearchQuery.isNotEmpty()) "Aucun résultat" else "Aucun favori",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        SortMenu(
+                            isMenuOpen = showSortMenu,
+                            onMenuOpenChange = { showSortMenu = it },
+                            viewModel = viewModel,
+                            modifier = Modifier.padding(top = 32.dp)
                         )
-                        if (bookmarkSearchQuery.isEmpty()) {
-                            Spacer(modifier = Modifier.height(8.dp))
+
+                        IconButton(onClick = { isSearching = !isSearching }) {
+                            Icon(Icons.Filled.Search, contentDescription = "Recherche")
+                        }
+                    }
+                )
+            } else {
+                SearchBar(
+                    transparent = true,
+                    searchQuery = bookmarkSearchQuery,
+                    onSearchQueryChanged = { bookmarkSearchQuery = it },
+                    onCloseSearch = { isSearching = false; bookmarkSearchQuery = "" },
+                    modifier = Modifier.background(Color(0xFF00999d))
+                )
+            }
+
+            // Main Content with RateLimitedPullToRefresh
+            RateLimitedPullToRefresh(
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.loadStations() },
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.weight(1f)
+            ) {
+                if (displayedFavorites.isEmpty()) {
+                    // Empty State
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 0.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
                             Text(
-                                text = "Ajoutez des stations favorites depuis la recherche pour les voir ici.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                textAlign = TextAlign.Center,
+                                text = if (bookmarkSearchQuery.isNotEmpty()) "Aucun résultat" else "Aucun favori",
+                                style = MaterialTheme.typography.headlineSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            if (bookmarkSearchQuery.isEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "Ajoutez des stations favorites depuis la recherche pour les voir ici.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    // Dashboard Grid
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 140.dp),
+                        contentPadding = PaddingValues(
+                            top = 0.dp,
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 80.dp
+                        ),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize(),
+                        state = gridState
+                    ) {
+                        items(
+                            items = displayedFavorites,
+                            key = { it.number },
+                            span = { station ->
+                                val isLarge = largeTileStations.value.contains(station.number)
+                                GridItemSpan(if (isLarge) 2 else 1)
+                            }
+                        ) { station ->
+                            FavoriteStationTile(
+                                station = station,
+                                isLarge = largeTileStations.value.contains(station.number),
+                                onClick = { selectedStation = station },
+                                onUnfavorite = { viewModel.toggleFavorite(station.number) },
+                                onToggleSize = { viewModel.toggleStationSize(station.number) },
+                                sortField = sortField.value ?: SortField.NUMBER
                             )
                         }
                     }
                 }
-            } else {
-                // Dashboard Grid
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 140.dp),
-                    contentPadding = PaddingValues(top = 0.dp, start = 16.dp, end = 16.dp, bottom = 80.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize(),
-                    state = gridState
-                ) {
-                    items(
-                        items = displayedFavorites,
-                        key = { it.number },
-                        span = { station ->
-                            val isLarge = largeTileStations.value.contains(station.number)
-                            GridItemSpan(if (isLarge) 2 else 1)
-                        }
-                    ) { station ->
-                        FavoriteStationTile(
-                            station = station,
-                            isLarge = largeTileStations.value.contains(station.number),
-                            onClick = { selectedStation = station },
-                            onUnfavorite = { viewModel.toggleFavorite(station.number) },
-                            onToggleSize = { viewModel.toggleStationSize(station.number) }
-                        )
-                    }
-                }
             }
         }
-    }
 
-    LocationFab(
-        viewModel = viewModel,
-        snackbarHostState = snackbarHostState,
-        modifier = Modifier
-            .align(Alignment.BottomEnd)
-            .padding(bottom = 16.dp, end = 16.dp)
-    )
+        LocationFab(
+            viewModel = viewModel,
+            snackbarHostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 16.dp, end = 16.dp)
+        )
 
-    SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .padding(16.dp)
-    )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
     }
 
     // Station Details Bundle
