@@ -4,13 +4,12 @@ import SortField
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.ElectricBike
 import androidx.compose.material.icons.filled.LocalParking
+import androidx.compose.material.icons.filled.NearMe
+import androidx.compose.material.icons.filled.NorthEast
 import androidx.compose.material.icons.filled.PedalBike
-import androidx.compose.material.icons.filled.Pin
+import androidx.compose.material.icons.filled.SouthEast
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.*
@@ -46,15 +45,15 @@ fun SortMenu(
             )
 
             SortOrderMenuItem(
-                label = "Ascendant",
-                icon = Icons.Filled.ArrowUpward,
+                label = "Croissant",
+                icon = Icons.Filled.NorthEast,
                 isSelected = currentSortOrder.value == SortOrder.ASCENDING,
                 onClick = { viewModel.setSortOrder(SortOrder.ASCENDING) }
             )
 
             SortOrderMenuItem(
-                label = "Descendant",
-                icon = Icons.Filled.ArrowDownward,
+                label = "Décroissant",
+                icon = Icons.Filled.SouthEast,
                 isSelected = currentSortOrder.value == SortOrder.DESCENDING,
                 onClick = { viewModel.setSortOrder(SortOrder.DESCENDING) }
             )
@@ -77,7 +76,8 @@ fun SortMenu(
                 ),
                 SortOption("Vélos mécaniques", SortField.MECHANICAL_BIKES, Icons.Filled.PedalBike),
                 SortOption("Vélos électriques", SortField.ELECTRICAL_BIKES, Icons.Filled.ElectricBike),
-                SortOption("Nombre de places", SortField.AVAILABLE_STANDS, Icons.Filled.LocalParking)
+                SortOption("Nombre de places", SortField.AVAILABLE_STANDS, Icons.Filled.LocalParking),
+                SortOption("Proximité", SortField.PROXIMITY, Icons.Default.NearMe)
             )
 
             sortOptions.forEach { option ->
