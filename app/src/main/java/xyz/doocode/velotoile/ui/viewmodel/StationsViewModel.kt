@@ -172,7 +172,7 @@ class StationsViewModel : ViewModel() {
         if (query.isNotEmpty()) {
             filtered = filtered.filter { station ->
                 station.name.lowercase().contains(query) ||
-                station.address.lowercase().contains(query)
+                        station.address.lowercase().contains(query)
             }
         }
 
@@ -187,13 +187,20 @@ class StationsViewModel : ViewModel() {
             SortField.PROXIMITY -> {
                 val loc = _userLocation.value
                 if (loc != null) {
-                    filtered.sortedBy { 
+                    filtered.sortedBy {
                         val results = FloatArray(1)
-                        Location.distanceBetween(loc.latitude, loc.longitude, it.position.latitude, it.position.longitude, results)
+                        Location.distanceBetween(
+                            loc.latitude,
+                            loc.longitude,
+                            it.position.latitude,
+                            it.position.longitude,
+                            results
+                        )
                         results[0]
                     }
                 } else filtered
             }
+
             else -> filtered
         }
 
@@ -218,13 +225,20 @@ class StationsViewModel : ViewModel() {
             SortField.PROXIMITY -> {
                 val loc = _userLocation.value
                 if (loc != null) {
-                    filtered.sortedBy { 
+                    filtered.sortedBy {
                         val results = FloatArray(1)
-                        Location.distanceBetween(loc.latitude, loc.longitude, it.position.latitude, it.position.longitude, results)
+                        Location.distanceBetween(
+                            loc.latitude,
+                            loc.longitude,
+                            it.position.latitude,
+                            it.position.longitude,
+                            results
+                        )
                         results[0]
                     }
                 } else filtered
             }
+
             else -> filtered
         }
 

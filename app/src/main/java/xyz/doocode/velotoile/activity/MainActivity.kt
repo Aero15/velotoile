@@ -1,10 +1,17 @@
 package xyz.doocode.velotoile.activity
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.content.ContextCompat
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -41,14 +48,36 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.remember
 import xyz.doocode.velotoile.ui.viewmodel.StationsViewModel
+import SortField
 
 class MainActivity : ComponentActivity() {
     private val viewModel: StationsViewModel by viewModels()
+    private var locationManager: LocationManager? = null
+
+    private val locationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            viewModel.updateUserLocation(location)
+        }
+
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         viewModel.initializePreferences(this)
+
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        viewModel.sortField.observe(this) { sortField ->
+            if (sortField == SortField.PROXIMITY) {
+                startLocationUpdates()
+            } else {
+                stopLocationUpdates()
+            }
+        }
 
         setContent {
             VelotoileTheme {
@@ -61,11 +90,45 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         viewModel.loadStations()
         viewModel.startAutoRefresh()
+        if (viewModel.sortField.value == SortField.PROXIMITY) {
+            startLocationUpdates()
+        }
     }
 
     override fun onStop() {
         super.onStop()
         viewModel.stopAutoRefresh()
+        stopLocationUpdates()
+    }
+
+    private fun startLocationUpdates() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            try {
+                locationManager?.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    2000L, // 2 seconds
+                    5f,    // 5 meters
+                    locationListener
+                )
+                // Also listen to network provider for faster location
+                locationManager?.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,
+                    5000L,
+                    10f,
+                    locationListener
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun stopLocationUpdates() {
+        locationManager?.removeUpdates(locationListener)
     }
 }
 
@@ -80,7 +143,7 @@ fun NavBarApp(viewModel: StationsViewModel) {
             AppDestinations.HOME
         }
     }
-    
+
     var currentDestination by rememberSaveable { mutableStateOf(initialDestination) }
 
     NavigationSuiteScaffold(
@@ -116,15 +179,19 @@ fun NavBarApp(viewModel: StationsViewModel) {
                             animationSpec = tween(durationMillis = 250),
                             initialOffsetX = { it * direction }
                         ) + fadeIn(animationSpec = tween(durationMillis = 100)) togetherWith
-                        slideOutHorizontally(
-                            animationSpec = tween(durationMillis = 250),
-                            targetOffsetX = { -it * direction }
-                        ) + fadeOut(animationSpec = tween(durationMillis = 100))
+                                slideOutHorizontally(
+                                    animationSpec = tween(durationMillis = 250),
+                                    targetOffsetX = { -it * direction }
+                                ) + fadeOut(animationSpec = tween(durationMillis = 100))
                     }
                 ) { destination ->
                     when (destination) {
                         AppDestinations.HOME -> HomeScreen()
-                        AppDestinations.SEARCH -> SearchScreen(viewModel = viewModel, modifier = Modifier.fillMaxSize())
+                        AppDestinations.SEARCH -> SearchScreen(
+                            viewModel = viewModel,
+                            modifier = Modifier.fillMaxSize()
+                        )
+
                         AppDestinations.BOOKMARKS -> BookmarksScreen(viewModel = viewModel)
                         AppDestinations.MENU -> MenuScreen()
                     }
@@ -183,6 +250,7 @@ private fun HomeScreenPreview() {
         HomeScreen()
     }
 }
+
 @Composable
 fun MenuScreen() {
     Text("TODO: Menu")

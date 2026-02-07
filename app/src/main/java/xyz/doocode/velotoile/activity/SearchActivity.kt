@@ -49,7 +49,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     var isSearching by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var selectedStation by remember { mutableStateOf<Station?>(null) }
-    
+
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
     val searchQuery = viewModel.searchQuery.observeAsState("")
 
@@ -100,6 +100,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
             is Resource.Loading<*> -> {
                 // Afficher un loader
             }
+
             is Resource.Success<*> -> {
                 StationsList(
                     stations = filteredStations.value,
@@ -109,9 +110,11 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     isSearching = isSearching
                 )
             }
+
             is Resource.Error<*> -> {
                 // Afficher l'erreur
             }
+
             else -> {
                 // État initial
             }
