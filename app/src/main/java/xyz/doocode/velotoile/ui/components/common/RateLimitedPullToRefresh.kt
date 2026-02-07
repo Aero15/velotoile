@@ -32,7 +32,10 @@ fun RateLimitedPullToRefresh(
             if (currentTime - lastRefreshTime < 15_000) {
                 scope.launch {
                     snackbarHostState.currentSnackbarData?.dismiss()
-                    snackbarHostState.showSnackbar("Veuillez réessayer ultérieurement.")
+                    snackbarHostState.showSnackbar(
+                        message = "Veuillez réessayer ultérieurement.",
+                        withDismissAction = true
+                    )
                 }
             } else {
                 lastRefreshTime = currentTime
@@ -58,7 +61,10 @@ fun RefreshSuccessObserver(
             if (resource is Resource.Success<*>) {
                 val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
                 scope.launch {
-                    snackbarHostState.showSnackbar("Mis à jour à l'instant ($time)")
+                    snackbarHostState.showSnackbar(
+                        message = "Mis à jour à l'instant ($time)",
+                        withDismissAction = true
+                    )
                 }
             }
         }

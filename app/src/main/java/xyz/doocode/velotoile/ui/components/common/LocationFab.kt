@@ -30,29 +30,43 @@ fun LocationFab(
     val scope = rememberCoroutineScope()
 
     fun refreshLocationAndSort() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-             try {
-                val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) 
-                    ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-                
+            try {
+                val locationManager =
+                    context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                val lastKnownLocation =
+                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                        ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+
                 lastKnownLocation?.let {
                     viewModel.updateUserLocation(it)
                     viewModel.setSortField(SortField.PROXIMITY)
-                    scope.launch { 
+                    scope.launch {
                         snackbarHostState.currentSnackbarData?.dismiss()
-                        snackbarHostState.showSnackbar("Tri par proximité activé") 
+                        snackbarHostState.showSnackbar(
+                            message = "Tri par proximité activé",
+                            withDismissAction = true
+                        )
                     }
                 } ?: run {
-                     scope.launch { 
+                    scope.launch {
                         snackbarHostState.currentSnackbarData?.dismiss()
-                        snackbarHostState.showSnackbar("Impossible de récupérer la position") 
+                        snackbarHostState.showSnackbar(
+                            message = "Impossible de récupérer la position",
+                            withDismissAction = true
+                        )
                     }
                 }
             } catch (e: Exception) {
-                 e.printStackTrace()
+                e.printStackTrace()
             }
         }
     }
@@ -60,25 +74,40 @@ fun LocationFab(
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true || 
-            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
+        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        ) {
             refreshLocationAndSort()
         } else {
-             scope.launch { 
+            scope.launch {
                 snackbarHostState.currentSnackbarData?.dismiss()
-                snackbarHostState.showSnackbar("Permission de localisation nécessaire") 
+                snackbarHostState.showSnackbar(
+                    message = "Permission de localisation nécessaire",
+                    withDismissAction = true
+                )
             }
         }
     }
 
     FloatingActionButton(
         onClick = {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
             ) {
                 refreshLocationAndSort()
             } else {
-                locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+                locationPermissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
             }
         },
         modifier = modifier,
