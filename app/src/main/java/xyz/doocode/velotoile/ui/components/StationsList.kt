@@ -17,7 +17,8 @@ fun StationsList(
     onStationClick: (Station) -> Unit = {},
     sortField: SortField = SortField.NUMBER,
     isSearching: Boolean = false,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    state: LazyListState = rememberLazyListState()
 ) {
     if (stations.isEmpty()) {
         Box(
@@ -35,7 +36,8 @@ fun StationsList(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize(),
-            contentPadding = contentPadding
+            contentPadding = contentPadding,
+            state = state
         ) {
             item {
                 Text(

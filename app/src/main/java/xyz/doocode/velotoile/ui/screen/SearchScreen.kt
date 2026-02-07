@@ -1,6 +1,7 @@
 package xyz.doocode.velotoile.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.lazy.rememberLazyListState
 import xyz.doocode.velotoile.ui.theme.VelotoileTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,14 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
     val searchQuery = viewModel.searchQuery.observeAsState("")
+    val currentSortField = viewModel.sortField.observeAsState(SortField.NUMBER)
+    val sortOrder = viewModel.sortOrder.observeAsState()
+    val userLocation = viewModel.userLocation.observeAsState()
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(currentSortField.value, sortOrder.value, userLocation.value) {
+        listState.scrollToItem(0)
+    }
     
     val snackbarHostState = remember { SnackbarHostState() }
     val stationsResource = viewModel.stations.observeAsState()
@@ -88,8 +97,6 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                     .background(Color(0xFF00999d))
             )
         }
-
-        val currentSortField = viewModel.sortField.observeAsState(SortField.NUMBER)
         
         RateLimitedPullToRefresh(
             isRefreshing = stationsResource.value is Resource.Loading,
@@ -109,7 +116,8 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                         onStationClick = { station -> selectedStation = station },
                         sortField = currentSortField.value,
                         isSearching = isSearching,
-                        contentPadding = PaddingValues(bottom = 80.dp)
+                        contentPadding = PaddingValues(bottom = 80.dp),
+                        state = listState
                     )
                 }
                 is Resource.Error<*> -> {

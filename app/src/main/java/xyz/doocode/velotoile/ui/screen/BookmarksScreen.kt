@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
@@ -39,7 +40,15 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
     val favoriteStations = viewModel.favoriteStations.observeAsState(emptyList())
     val largeTileStations = viewModel.largeTileStations.observeAsState(emptySet())
     val stationsResource = viewModel.stations.observeAsState()
+    val sortField = viewModel.sortField.observeAsState()
+    val sortOrder = viewModel.sortOrder.observeAsState()
+    val userLocation = viewModel.userLocation.observeAsState()
     
+    val gridState = rememberLazyGridState()
+
+    LaunchedEffect(sortField.value, sortOrder.value, userLocation.value) {
+        gridState.scrollToItem(0)
+    }
     // Refresh state
     val isRefreshing = stationsResource.value is Resource.Loading
     
@@ -140,7 +149,8 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                     contentPadding = PaddingValues(top = 0.dp, start = 16.dp, end = 16.dp, bottom = 80.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    state = gridState
                 ) {
                     items(
                         items = displayedFavorites,
