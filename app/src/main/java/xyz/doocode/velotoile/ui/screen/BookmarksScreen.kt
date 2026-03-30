@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import xyz.doocode.velotoile.core.dto.Station
 import SortField
 import xyz.doocode.velotoile.ui.components.dashboard.FavoriteStationTile
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
@@ -35,12 +34,15 @@ import xyz.doocode.velotoile.ui.components.common.RefreshSuccessObserver
 fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     var isSearching by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
-    var selectedStation by remember { mutableStateOf<Station?>(null) }
+    var selectedStationNumber by remember { mutableStateOf<Int?>(null) }
     var bookmarkSearchQuery by rememberSaveable { mutableStateOf("") }
 
     val favoriteStations = viewModel.favoriteStations.observeAsState(emptyList())
     val largeTileStations = viewModel.largeTileStations.observeAsState(emptySet())
     val stationsResource = viewModel.stations.observeAsState()
+    val allStations = (stationsResource.value as? Resource.Success)?.data ?: emptyList()
+    val selectedStation =
+        selectedStationNumber?.let { num -> allStations.find { it.number == num } }
     val sortField = viewModel.sortField.observeAsState()
     val sortOrder = viewModel.sortOrder.observeAsState()
     val userLocation = viewModel.userLocation.observeAsState()
@@ -169,7 +171,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                             FavoriteStationTile(
                                 station = station,
                                 isLarge = largeTileStations.value.contains(station.number),
-                                onClick = { selectedStation = station },
+                                onClick = { selectedStationNumber = station.number },
                                 onUnfavorite = { viewModel.toggleFavorite(station.number) },
                                 onToggleSize = { viewModel.toggleStationSize(station.number) },
                                 sortField = sortField.value ?: SortField.NUMBER
@@ -197,11 +199,9 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
     }
 
     // Station Details Bundle
-    selectedStation?.let { station ->
         StationDetailsSheet(
-            station = station,
-            onDismiss = { selectedStation = null },
+        station = selectedStation,
+        onDismiss = { selectedStationNumber = null },
             onToggleFavorite = { stationNumber -> viewModel.toggleFavorite(stationNumber) }
         )
-    }
 }

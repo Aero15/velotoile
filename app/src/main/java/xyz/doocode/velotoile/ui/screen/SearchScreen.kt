@@ -20,7 +20,6 @@ import xyz.doocode.velotoile.ui.components.search.menu.SortMenu
 import xyz.doocode.velotoile.ui.components.StationsList
 import xyz.doocode.velotoile.ui.components.search.SearchBar
 import xyz.doocode.velotoile.ui.components.details.StationDetailsSheet
-import xyz.doocode.velotoile.core.dto.Station
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,7 +33,7 @@ import xyz.doocode.velotoile.ui.components.common.RefreshSuccessObserver
 fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     var isSearching by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
-    var selectedStation by remember { mutableStateOf<Station?>(null) }
+    var selectedStationNumber by remember { mutableStateOf<Int?>(null) }
 
     val filteredStations = viewModel.filteredStations.observeAsState(emptyList())
     val searchQuery = viewModel.searchQuery.observeAsState("")
@@ -49,6 +48,9 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val stationsResource = viewModel.stations.observeAsState()
+    val allStations = (stationsResource.value as? Resource.Success)?.data ?: emptyList()
+    val selectedStation =
+        selectedStationNumber?.let { num -> allStations.find { it.number == num } }
 
     RefreshSuccessObserver(
         isRefreshing = stationsResource.value is Resource.Loading,
@@ -114,7 +116,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
                         StationsList(
                             stations = filteredStations.value,
                             modifier = Modifier.fillMaxSize(),
-                            onStationClick = { station -> selectedStation = station },
+                            onStationClick = { station -> selectedStationNumber = station.number },
                             sortField = currentSortField.value,
                             isSearching = isSearching,
                             contentPadding = PaddingValues(bottom = 80.dp),
@@ -152,7 +154,7 @@ fun SearchScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier) {
     // Station details sheet
     StationDetailsSheet(
         station = selectedStation,
-        onDismiss = { selectedStation = null },
+        onDismiss = { selectedStationNumber = null },
         onToggleFavorite = { stationNumber -> viewModel.toggleFavorite(stationNumber) }
     )
 }
