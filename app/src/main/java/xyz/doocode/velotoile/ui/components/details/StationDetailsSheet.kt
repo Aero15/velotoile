@@ -79,9 +79,6 @@ fun StationDetailsSheet(
                 // Recap tiles (mechanical bikes, electric bikes, available stands)
                 StationDetailsRecap(station = station)
 
-                // Bikes section
-                StationDetailsBikesCard(station = station)
-
                 // Stands section
                 StationDetailsStandsCard(station = station)
 
