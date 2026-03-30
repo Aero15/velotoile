@@ -146,6 +146,7 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                         }
                     }
                 } else {
+                    val largeStations = largeTileStations.value
                     // Dashboard Grid
                     LazyVerticalGrid(
                         columns = GridCells.Adaptive(minSize = 140.dp),
@@ -162,15 +163,22 @@ fun BookmarksScreen(viewModel: StationsViewModel, modifier: Modifier = Modifier)
                     ) {
                         items(
                             items = displayedFavorites,
-                            key = { it.number },
+                            key = { station ->
+                                if (largeStations.contains(station.number)) {
+                                    "${station.number}-L"
+                                } else {
+                                    "${station.number}-S"
+                                }
+                            },
                             span = { station ->
-                                val isLarge = largeTileStations.value.contains(station.number)
-                                GridItemSpan(if (isLarge) 2 else 1)
+                                val isLarge = largeStations.contains(station.number)
+                                GridItemSpan(if (isLarge) maxLineSpan else 1)
                             }
                         ) { station ->
+                            val isLarge = largeStations.contains(station.number)
                             FavoriteStationTile(
                                 station = station,
-                                isLarge = largeTileStations.value.contains(station.number),
+                                isLarge = isLarge,
                                 onClick = { selectedStationNumber = station.number },
                                 onUnfavorite = { viewModel.toggleFavorite(station.number) },
                                 onToggleSize = { viewModel.toggleStationSize(station.number) },

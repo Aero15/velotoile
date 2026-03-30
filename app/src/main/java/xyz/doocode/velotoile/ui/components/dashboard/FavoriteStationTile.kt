@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import xyz.doocode.velotoile.core.dto.Station
 import SortField
 
@@ -41,6 +43,7 @@ fun FavoriteStationTile(
     var showMenu by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
     val clipboardManager = LocalClipboardManager.current
+    val coroutineScope = rememberCoroutineScope()
 
     // Determine colors/status
     val isOpen = station.status == "OPEN"
@@ -115,7 +118,13 @@ fun FavoriteStationTile(
                 )
                 DropdownMenuItem(
                     text = { Text(if (isLarge) "Taille normale" else "Grande taille") },
-                    onClick = { showMenu = false; onToggleSize() },
+                    onClick = {
+                        showMenu = false
+                        coroutineScope.launch {
+                            yield()
+                            onToggleSize()
+                        }
+                    },
                     leadingIcon = {
                         Icon(
                             if (isLarge) Icons.Default.CloseFullscreen else Icons.Default.OpenInFull,
